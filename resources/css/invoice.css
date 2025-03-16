@@ -1,0 +1,145 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+.invoice {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Styles */
+.invoice-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+}
+
+.invoice-header h1 {
+    font-size: 24px;
+    margin: 0;
+    color: #333;
+}
+
+.invoice-header p {
+    font-size: 14px;
+    color: #777;
+    margin: 5px 0;
+}
+
+/* Company and Customer Details */
+.invoice-details {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.invoice-details .company-info,
+.invoice-details .customer-info {
+    width: 48%;
+}
+
+.invoice-details h2 {
+    font-size: 18px;
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.invoice-details p {
+    font-size: 14px;
+    margin: 5px 0;
+    color: #555;
+}
+
+/* Table Styles */
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.invoice-table th,
+.invoice-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.invoice-table th {
+    background-color: #f5f5f5;
+    font-size: 14px;
+    color: #333;
+}
+
+.invoice-table td {
+    font-size: 14px;
+    color: #555;
+}
+
+.invoice-table tfoot td {
+    font-weight: bold;
+    background-color: #f5f5f5;
+}
+
+/* Footer Styles */
+.invoice-footer {
+    text-align: right;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+}
+
+.invoice-footer p {
+    font-size: 14px;
+    color: #777;
+    margin: 5px 0;
+}
+
+/* Print Button */
+.print-button {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.print-button a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.print-button a:hover {
+    background-color: #0056b3;
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background-color: #fff;
+        margin: 0;
+        padding: 0;
+    }
+
+    .invoice {
+        box-shadow: none;
+        border: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .print-button {
+        display: none;
+    }
+}
