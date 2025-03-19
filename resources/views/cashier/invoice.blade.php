@@ -4,14 +4,14 @@
 <div class="struk">
         <!-- Header -->
         <div class="struk-header">
-            <h1>Toko Pakaian Offline</h1>
+            <h1>Kasir Toko</h1>
             <p>Jl. Contoh No. 123, Kota Contoh</p>
             <p>Telp: 0812-3456-7890</p>
             <p>Invoice: #{{ $transaction->invoice_number }}</p>
             <p>Tanggal: {{ $transaction->created_at->format('d/m/Y H:i:s') }}</p>
         </div>
 
-        <!-- Table -->
+       
         <table class="struk-table">
             <thead>
                 <tr>
@@ -32,10 +32,24 @@
                 @endforeach
             </tbody>
             <tfoot>
+                
                 <tr>
                     <td colspan="3">Total</td>
                     <td>Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</td>
                 </tr>
+                <tr>
+                    <td colspan="3">Metode Pembayaran</td>
+                    <td>{{ $transaction->paymentMethod->name }}</td>
+                </tr>
+                <tr>
+                    <td colspan="3">Uang Bayar</td>
+                    <td>Rp {{ number_format($transaction->payment_amount, 0, ',', '.') }}</td>
+                </tr
+                <tr>
+                    <td colspan="3">Kembalian</td>
+                    <td>Rp {{ number_format($transaction->change_amount, 0, ',', '.') }}</td>
+                </tr>
+                
             </tfoot>
         </table>
 
@@ -66,7 +80,7 @@ body {
 
 .struk {
     width: 100%;
-    max-width: 300px; /* Lebar struk */
+    max-width: 350px; /* Lebar struk */
     margin: 0 auto;
     padding: 10px;
     border: 1px solid #000;

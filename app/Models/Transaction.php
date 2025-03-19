@@ -12,6 +12,8 @@ class Transaction extends Model
     protected $fillable = [
         'invoice_number',
         'total_amount',
+        'payment_amount',
+        'change_amount',
         'payment_method_id',
     ];
 

@@ -7,6 +7,7 @@ use App\Models\Supplier;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Picqer\Barcode\BarcodeGeneratorPNG;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -50,6 +51,10 @@ class ProductController extends Controller
 
         // Simpan data produk
         Product::create($data);
+
+        // Generate dan simpan barcode
+        
+        
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
     }
@@ -100,24 +105,22 @@ class ProductController extends Controller
 
         return response($barcode)->header('Content-Type', 'image/png');
     }
-    public function findByBarcode($barcode)
+    public function findByBarcode(Request $request)
     {
+        $barcode = $request->query('barcode');
+
+        if (!$barcode) {
+            return response()->json(['error' => 'Barcode tidak boleh kosong.'], 400);
+        }
+
         $product = Product::where('barcode', $barcode)->first();
 
-        if ($product) {
-            return response()->json([
-                'success' => true,
-                'product' => [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                ]
-            ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Produk tidak ditemukan.'
-            ], 404);
+        if (!$product) {
+            return response()->json(['error' => 'Produk tidak ditemukan.'], 404);
         }
+
+        return response()->json($product);
     }
+
+    
 }

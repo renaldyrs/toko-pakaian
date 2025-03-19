@@ -81,6 +81,8 @@ class CashierController extends Controller
         $transaction = Transaction::create([
             'invoice_number' => $invoiceNumber,
             'total_amount' => $totalAmount,
+            'payment_amount' => $request->payment_amount,
+            'change_amount' => $request->change_amount,
             'payment_method_id' => $request->payment_method_id,
         ]);
 

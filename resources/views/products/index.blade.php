@@ -7,6 +7,8 @@
             <i class="fas fa-plus"></i> Tambah Produk
         </a>
 
+        
+
         <div class="row">
             @foreach ($products as $product)
                 <div class="col-md-3 mb-3">
@@ -26,8 +28,9 @@
                             </p>
                             <p class="card-text"><strong>Stok:</strong> {{ $product->stock }}</p>
                             <div class="barcode">
-                                <img src="{{ route('barcode.generate', $product->code) }}" alt="Barcode {{ $product->code }}">
+                                <img src="{{ route('barcode.generate', $product->id) }}" alt="Barcode {{ $product->id }}">
                             </div>
+                            <br>
                             <div class="d-flex justify-content-between">
                                 <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning btn-sm">
                                     <i class="fas fa-edit"></i> Edit
@@ -48,3 +51,13 @@
         </div>
     </div>
 @endsection
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Swal.fire({
+            title: 'Error!',
+            text: 'Do you want to continue',
+            icon: 'error',
+            confirmButtonText: 'Cool'
+          })
+</script>
