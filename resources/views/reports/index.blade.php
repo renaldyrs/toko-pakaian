@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Laporan Keuangan</h1>
+<h1 class="text-3xl font-bold mb-6">Laporan Keuangan</h1>
 
     <!-- Filter Tanggal -->
     <form action="{{ route('reports.index') }}" method="GET" class="mb-4">
@@ -30,6 +30,26 @@
         </div>
     </div>
 
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Total Pendapatan per Metode Pembayaran</h2>
+            <table class="min-w-full">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metode Pembayaran</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pendapatan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach ($revenueByPaymentMethod as $method => $revenue)
+                    <tr>
+                        <td class="px-6 py-4">{{ $method }}</td>
+                        <td class="px-6 py-4">Rp {{ number_format($revenue, 0, ',', '.') }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
     <!-- Daftar Transaksi -->
     <div class="card">
         <div class="card-body">
@@ -50,6 +70,11 @@
                         <td>{{ $transaction->created_at->format('d/m/Y H:i:s') }}</td>
                         <td>Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</td>
                         <td>{{ $transaction->paymentMethod->name }}</td>
+                        <td>
+                        <a href="{{ route('cashier.invoice', $transaction->id) }}" class="text-blue-500 hover:text-blue-700">
+                                <i class="fas fa-eye"></i> Lihat Detail
+                            </a>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>

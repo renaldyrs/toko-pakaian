@@ -8,13 +8,17 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use Illuminate\Support\Facades\Storage;
+use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['supplier', 'category'])->get();
-        return view('products.index', compact('products'));
+        $products = Product::with(['category'])->get();
+        $categories = Category::all();
+        $suppliers = Supplier::all();
+        return view('products.index', compact('products', 'categories', 'suppliers'));
     }
 
     // Menampilkan form tambah produk
@@ -30,31 +34,35 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'supplier_id' => 'nullable|exists:suppliers,id',
+            'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->all();
-
         // Generate kode produk
-        $data['code'] = Product::generateProductCode($request->category_id);
+        $code = Product::generateProductCode($request->category_id);
 
         // Upload gambar jika ada
+        $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('products', 'public');
-            $data['image'] = $imagePath;
         }
 
-        // Simpan data produk
-        Product::create($data);
+        // Simpan produk
+        $product = Product::create([
+            'code' => $code,
+            'name' => $request->name,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'image' => $imagePath,
+        ]);
 
-        // Generate dan simpan barcode
-        
-        
+        // Generate barcode
+        $product->generateBarcode();
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
     }
@@ -105,21 +113,29 @@ class ProductController extends Controller
 
         return response($barcode)->header('Content-Type', 'image/png');
     }
-    public function findByBarcode(Request $request)
+    public function findByCode(Request $request)
+{
+    $code = $request->query('code'); // Ambil kode dari query parameter
+    $product = Product::where('code', $code)->first(); // Cari produk berdasarkan kode
+
+    return response()->json($product); // Kembalikan data produk dalam format JSON
+}
+
+    public function downloadBarcode($id)
     {
-        $barcode = $request->query('barcode');
+        $product = Product::findOrFail($id);
 
-        if (!$barcode) {
-            return response()->json(['error' => 'Barcode tidak boleh kosong.'], 400);
-        }
+        // Generate barcode
+        $barcodeImage = DNS1D::getBarcodePNG($product->barcode, 'C128');
 
-        $product = Product::where('barcode', $barcode)->first();
+        // Set header untuk response
+        $headers = [
+            'Content-Type' => 'image/png',
+            'Content-Disposition' => 'attachment; filename="' . $product->barcode . '.png"',
+        ];
 
-        if (!$product) {
-            return response()->json(['error' => 'Produk tidak ditemukan.'], 404);
-        }
-
-        return response()->json($product);
+        // Return response dengan gambar barcode
+        return response($barcodeImage, Response::HTTP_OK, $headers);
     }
 
     

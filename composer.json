@@ -10,7 +10,10 @@
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
-        "picqer/php-barcode-generator": "^3.2"
+        "livewire/livewire": "^3.6",
+        "milon/barcode": "^12.0",
+        "picqer/php-barcode-generator": "^3.2",
+        "realrashid/sweet-alert": "^7.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

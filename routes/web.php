@@ -59,5 +59,24 @@ Route::middleware('auth')->group(function () {
 
  
     Route::resource('users', UserController::class);
+    Route::get('/products/{id}/download-barcode', [ProductController::class, 'downloadBarcode'])->name('products.downloadBarcode');
 
+    Route::get('/products/find-by-code{code}', [ProductController::class, 'findByCode'])->name('products.find-by-code');
+
+Route::get('/products/{barcode}', [ProductController::class, 'findByBarcode']);
     
+use App\Http\Controllers\StoreProfileController;
+
+Route::prefix('store-profile')->group(function () {
+    Route::get('/edit', [StoreProfileController::class, 'edit'])->name('store-profile.edit');
+    Route::put('/update', [StoreProfileController::class, 'update'])->name('store-profile.update');
+});
+
+// Route untuk halaman kasir
+Route::get('/cashier', [CashierController::class, 'index'])->name('cashier.index');
+
+// Route untuk menyimpan transaksi
+Route::post('/cashier', [CashierController::class, 'store'])->name('cashier.store');
+
+// Route untuk menampilkan invoice
+Route::get('/cashier/invoice/{id}', [CashierController::class, 'invoice'])->name('cashier.invoice');

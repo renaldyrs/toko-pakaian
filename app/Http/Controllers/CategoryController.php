@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class CategoryController extends Controller
 {
@@ -29,8 +30,9 @@ class CategoryController extends Controller
         ]);
 
         Category::create($request->all());
+        Alert::success('Kategori berhasil ditambahkan.');
 
-        return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan.');
+        return redirect()->route('categories.index');
     }
 
     // Menampilkan detail kategori
@@ -54,14 +56,16 @@ class CategoryController extends Controller
         ]);
 
         $category->update($request->all());
+        Alert::success('Kategori berhasil diperbarui.');
 
-        return redirect()->route('categories.index')->with('success', 'Kategori berhasil diperbarui.');
+        return redirect()->route('categories.index');
     }
 
     // Menghapus kategori
     public function destroy(Category $category)
     {
         $category->delete();
-        return redirect()->route('categories.index')->with('success', 'Kategori berhasil dihapus.');
+        Alert::success('Kategori berhasil dihapus.');
+        return redirect()->route('categories.index');
     }
 }

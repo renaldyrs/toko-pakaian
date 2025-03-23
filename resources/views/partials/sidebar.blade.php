@@ -1,291 +1,122 @@
-<div class="sidebar">
-    <div class="sidebar-header">
-        <!-- Avatar -->
-        <div class="avatar-container">
-            <img src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('images/default-avatar.png') }}"
-                alt="Avatar" class="avatar">
+<!-- Sidebar -->
+<aside class="bg-gray-800 text-white w-64 min-h-screen">
+    <div class="p-4">
+        <!-- Avatar dan User -->
+        <div class="flex items-center mb-6">
+            <img src="{{ DB::table('store_profiles')->first()->logo ? asset('storage/' . DB::table('store_profiles')->first()->logo) : asset('images/default-logo.png') }}"
+                alt="User Avatar" class="w-8 h-8 rounded-full">
+            <span class="ml-2">Admin</span>
         </div>
-        <!-- Nama Pengguna -->
-        <div class="user-name">
-            {{ auth()->user()->name }}
-        </div>
+
+        <!-- Menu Sidebar -->
+        <ul>
+            <li class="mb-2">
+                <a href="{{ route('dashboard') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                        </path>
+                    </svg>
+                    Dashboard
+                </a>
+            </li>
+
+            <!-- Dropdown Master -->
+            <li class="mb-2">
+                <button onclick="toggleMasterMenu()"
+                    class="flex items-center justify-between w-full p-2 hover:bg-gray-700 rounded">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        </svg>
+                        Master
+                    </div>
+                    <svg id="masterMenuIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+
+                <!-- Submenu Master -->
+                <ul id="masterMenu" class="hidden pl-4">
+                    <li class="mt-2">
+                        <a href="{{ route('store-profile.edit') }}"
+                            class="flex items-center p-2 hover:bg-gray-700 rounded">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                </path>
+                            </svg>
+                            Toko
+                        </a>
+                    </li>
+                    <li class="mt-2">
+                        <a href="{{ route('users.index') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                </path>
+                            </svg>
+                            Pengguna
+                        </a>
+                    </li>
+                    <li class="mt-2">
+                        <a href="{{ route('categories.index') }}"
+                            class="flex items-center p-2 hover:bg-gray-700 rounded">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                            </svg>
+                            Kategori
+                        </a>
+                    </li>
+                    <li class="mt-2">
+                        <a href="{{ route('suppliers.index') }}"
+                            class="flex items-center p-2 hover:bg-gray-700 rounded">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                </path>
+                            </svg>
+                            Supplier
+                        </a>
+                    </li>
+                    <li class="mt-2">
+                        <a href="{{ route('products.index') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
+                                </path>
+                            </svg>
+                            Produk
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Transaksi -->
+            <li class="mb-2">
+                <a href="{{ route('cashier.index') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
+                        </path>
+                    </svg>
+                    Kasir
+                </a>
+            </li>
+
+            <!-- Laporan -->
+            <li class="mb-2">
+                <a href="{{ route('reports.index') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    Laporan
+                </a>
+            </li>
+        </ul>
     </div>
-    <ul class="sidebar-menu">
-        <li>
-            <a href="{{ route('dashboard') }}">
-                <i class="fas fa-home"></i> Dashboard
-            </a>
-        </li>
-
-        @if (Auth::user()->role == 'kasir')
-            <li>
-                <a href="{{ route('cashier.index') }}">
-                    <i class="fas fa-cash-register"></i> Kasir
-                </a>
-            </li>
-
-        @endif
-        @if (Auth::user()->role == 'admin')
-            <li class="has-submenu">
-                <a href="#">
-                    <i class="fas fa-cogs"></i> Master
-                    <i class="fas fa-angle-down"></i>
-                </a>
-                <ul class="submenu">
-                    <li> <a href="{{ route('users.index') }}"><i class="fas fa-users"></i> Pengguna</a></li>
-                    <li><a href="{{ route('categories.index') }}"><i class="fas fa-list"></i> Kategori</a></li>
-                    <li><a href="{{ route('suppliers.index') }}"><i class="fas fa-truck"></i> Supplier</a></li>
-                    <li><a href="{{ route('products.index') }}"><i class="fas fa-box"></i> Produk</a></li>
-                </ul>
-            </li>
-
-            <li class="has-submenu">
-                <a href="#">
-                    <i class="fas fa-shopping-cart"></i> Transaksi
-                    <i class="fas fa-angle-down"></i>
-                </a>
-                <ul class="submenu">
-                    <li><a href="{{ route('cashier.index') }}"><i class="fas fa-cash-register"></i> Kasir</a></li>
-                    <li><a href="{{ route('cashier.orders') }}"><i class="fas fa-list-alt"></i> Daftar Pesanan</a></li>
-                </ul>
-            </li>
-        @endif
-    </ul>
-</div>
-
-
-<style>
-    /* General Styles */
-    body {
-        margin: 0;
-        font-family: 'Poppins', sans-serif;
-        background-color: #f8f9fa;
-    }
-
-    /* Navbar */
-    .navbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #2c3e50;
-        color: #fff;
-        padding: 10px 20px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-    }
-
-    .navbar-left {
-        display: flex;
-        align-items: center;
-    }
-
-    .navbar-brand {
-        font-size: 20px;
-        font-weight: bold;
-        margin-left: 10px;
-    }
-
-    .sidebar-toggle {
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 20px;
-        cursor: pointer;
-    }
-
-    .navbar-right {
-        position: relative;
-    }
-
-    .profile-button {
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 16px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-    }
-
-    .profile-button i {
-        margin-left: 5px;
-    }
-
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        right: 0;
-        background-color: #fff;
-        min-width: 160px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-    }
-
-    .dropdown-content a {
-        color: #333;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-    }
-
-    .dropdown-content a:hover {
-        background-color: #f1f1f1;
-    }
-
-    .profile-dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-    /* Sidebar */
-    .sidebar {
-        width: 250px;
-        background-color: #34495e;
-        color: #fff;
-        height: 100vh;
-        position: fixed;
-        top: 60px;
-        left: 0;
-        transition: transform 0.3s ease;
-    }
-
-    .sidebar.collapsed {
-        transform: translateX(-250px);
-    }
-
-    .sidebar-menu {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .sidebar-menu li {
-        padding: 10px 20px;
-        border-bottom: 1px solid #2c3e50;
-    }
-
-    .sidebar-menu li a {
-        color: #fff;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-    }
-
-    .sidebar-menu li a i {
-        margin-right: 10px;
-    }
-
-    .sidebar-menu li a .fa-angle-down {
-        margin-left: auto;
-        transition: transform 0.3s ease;
-    }
-
-    .sidebar-menu li a .fa-angle-down.rotate {
-        transform: rotate(180deg);
-    }
-
-    .submenu {
-        list-style: none;
-        padding: 0;
-        margin: 10px 0 0 20px;
-        display: none;
-    }
-
-    .submenu.active {
-        display: block;
-    }
-
-    .submenu li {
-        padding: 5px 0;
-    }
-
-    .submenu li a {
-        color: #bdc3c7;
-        font-size: 14px;
-    }
-
-    .submenu li a:hover {
-        color: #fff;
-    }
-
-    .sidebar-header {
-        padding: 20px;
-        text-align: center;
-        border-bottom: 1px solid #4b545c;
-    }
-
-    .avatar-container {
-        margin-bottom: 10px;
-    }
-
-    .avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .user-name {
-        font-size: 18px;
-        font-weight: bold;
-    }
-
-    /* Main Content */
-    .main-content {
-        margin-left: 250px;
-        margin-top: 60px;
-        padding: 20px;
-        transition: margin-left 0.3s ease;
-    }
-
-    .sidebar.collapsed+.main-content {
-        margin-left: 0;
-    }
-
-    /* Responsive Styles */
-    @media (max-width: 768px) {
-        .sidebar {
-            transform: translateX(-250px);
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(0);
-        }
-
-        .main-content {
-            margin-left: 0;
-        }
-
-        .sidebar.collapsed+.main-content {
-            margin-left: 0;
-        }
-    }
-</style>
-
-<script>
-    // JavaScript untuk toggle sidebar dan submenu
-    document.addEventListener('DOMContentLoaded', function () {
-        const sidebarToggle = document.querySelector('.sidebar-toggle');
-        const sidebar = document.querySelector('.sidebar');
-        const submenuToggles = document.querySelectorAll('.has-submenu > a');
-
-        // Toggle sidebar
-        sidebarToggle.addEventListener('click', function () {
-            sidebar.classList.toggle('collapsed');
-        });
-
-        // Toggle submenu
-        submenuToggles.forEach(toggle => {
-            toggle.addEventListener('click', function (e) {
-                e.preventDefault();
-                const submenu = this.nextElementSibling;
-                submenu.classList.toggle('active');
-                this.querySelector('.fa-angle-down').classList.toggle('rotate');
-            });
-        });
-    });
-</script>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</aside>

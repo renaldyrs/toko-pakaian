@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
+use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -26,6 +27,19 @@ class ReportController extends Controller
         // Hitung jumlah transaksi
         $totalTransactions = $transactions->count();
 
-        return view('reports.index', compact('transactions', 'totalRevenue', 'totalTransactions', 'startDate', 'endDate'));
+        // Kelompokkan transaksi berdasarkan metode pembayaran
+        $paymentMethods = PaymentMethod::with(['transactions' => function ($query) use ($startDate, $endDate) {
+            if ($startDate && $endDate) {
+                $query->whereBetween('created_at', [$startDate, $endDate]);
+            }
+        }])->get();
+
+        // Hitung total pendapatan per metode pembayaran
+        $revenueByPaymentMethod = [];
+        foreach ($paymentMethods as $method) {
+            $revenueByPaymentMethod[$method->name] = $method->transactions->sum('total_amount');
+        }
+
+        return view('reports.index', compact('transactions', 'totalRevenue', 'totalTransactions', 'startDate', 'endDate', 'paymentMethods', 'revenueByPaymentMethod'));
     }
 }

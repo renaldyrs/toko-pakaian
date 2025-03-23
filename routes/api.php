@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Api\ProductController;
 
-Route::get('/products', [ProductController::class, 'findByBarcode']);
+Route::get('/products/{barcode}', [ProductController::class, 'show']);

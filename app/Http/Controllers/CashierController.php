@@ -6,19 +6,26 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\PaymentMethod;
+
+use App\Models\User;
+use App\Models\StoreProfile;
+use Illuminate\Console\View\Components\Alert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Barryvdh\DomPDF\Facade\Pdf;
+
+
 
 class CashierController extends Controller
 {
     // Menampilkan halaman kasir
     public function index()
     {
-        $products = Product::all();
+        $products = Product::where('stock', '>', 0)->get();
+        $storeProfile = StoreProfile::first();
         $paymentMethods = PaymentMethod::all();
-        return view('cashier.index', compact('products', 'paymentMethods'));
+        return view('cashier.index', compact('products', 'paymentMethods','storeProfile'));
     }
 
     // Menyimpan transaksi
@@ -54,7 +61,6 @@ class CashierController extends Controller
             $validator = Validator::make($item, [
                 'product_id' => 'required|exists:products,id',
                 'quantity' => 'required|integer|min:1',
-                'price' => 'required|numeric',
                 'subtotal' => 'required|numeric',
             ]);
     
@@ -105,15 +111,18 @@ class CashierController extends Controller
             $product->stock -= $item['quantity'];
             $product->save();
         }
-
-        return redirect()->route('cashier.invoice', $transaction->id)->with('success', 'Transaksi berhasil disimpan.');
+        alert('Pembayaran berhasil!');
+        return redirect()->route('cashier.index');
     }
 
     // Menampilkan invoice
     public function invoice($id)
     {
+        $storeProfile = StoreProfile::first();
+        $products = Product::where('stock', '>', 0)->get();
+        $paymentMethods = PaymentMethod::all();
         $transaction = Transaction::with(['details.product', 'paymentMethod'])->findOrFail($id);
-        return view('cashier.invoice', compact('transaction'));
+        return view('cashier.index', compact('transaction', 'storeProfile', 'paymentMethods','products'));
     }
 
     // Generate PDF invoice
