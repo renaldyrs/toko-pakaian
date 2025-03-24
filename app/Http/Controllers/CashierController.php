@@ -25,13 +25,13 @@ class CashierController extends Controller
         $products = Product::where('stock', '>', 0)->get();
         $storeProfile = StoreProfile::first();
         $paymentMethods = PaymentMethod::all();
-        return view('cashier.index', compact('products', 'paymentMethods','storeProfile'));
+        return view('cashier.index', compact('products', 'paymentMethods', 'storeProfile'));
     }
 
     // Menyimpan transaksi
     public function store(Request $request)
     {
-      
+
         // Konversi JSON string items ke array
         $items = json_decode($request->items, true);
 
@@ -40,30 +40,30 @@ class CashierController extends Controller
             'payment_method_id' => 'required|exists:payment_methods,id',
             'items' => 'required|json', // Pastikan items adalah JSON string
         ]);
-    
+
         // Debug: Tampilkan data request
         \Log::info('Request data:', $request->all());
-    
+
         // Konversi JSON string items ke array
         $items = json_decode($request->items, true);
-    
+
         // Periksa apakah json_decode berhasil
         if (json_last_error() !== JSON_ERROR_NONE) {
             return redirect()->back()->with('error', 'Format items tidak valid.');
         }
-    
+
         // Validasi manual untuk items
         if (!is_array($items)) {
             return redirect()->back()->with('error', 'Data items harus berupa array.');
         }
-    
+
         foreach ($items as $item) {
             $validator = Validator::make($item, [
                 'product_id' => 'required|exists:products,id',
                 'quantity' => 'required|integer|min:1',
                 'subtotal' => 'required|numeric',
             ]);
-    
+
             if ($validator->fails()) {
                 return redirect()->back()->with('error', 'Data items tidak valid.');
             }
@@ -112,7 +112,17 @@ class CashierController extends Controller
             $product->save();
         }
         alert('Pembayaran berhasil!');
-        return redirect()->route('cashier.index');
+        return redirect()->route('cashier.print', $transaction->id)
+        ->with('print', true);
+    }
+
+    public function print($id)
+    {
+        $storeProfile = StoreProfile::first();
+        $products = Product::where('stock', '>', 0)->get();
+        $paymentMethods = PaymentMethod::all();
+        $transaction = Transaction::with(['details.product', 'paymentMethod'])->findOrFail($id);
+        return view('cashier.print', compact('transaction', 'storeProfile', 'paymentMethods', 'products'));
     }
 
     // Menampilkan invoice
@@ -122,7 +132,7 @@ class CashierController extends Controller
         $products = Product::where('stock', '>', 0)->get();
         $paymentMethods = PaymentMethod::all();
         $transaction = Transaction::with(['details.product', 'paymentMethod'])->findOrFail($id);
-        return view('cashier.index', compact('transaction', 'storeProfile', 'paymentMethods','products'));
+        return view('cashier.invoice', compact('transaction', 'storeProfile', 'paymentMethods', 'products'));
     }
 
     // Generate PDF invoice
@@ -157,14 +167,14 @@ class CashierController extends Controller
     }
 
     public function orders()
-{
-    // Ambil semua transaksi beserta detail dan produk
-    $transactions = Transaction::with(['details.product', 'paymentMethod'])
-        ->orderBy('created_at', 'desc')
-        ->get();
+    {
+        // Ambil semua transaksi beserta detail dan produk
+        $transactions = Transaction::with(['details.product', 'paymentMethod'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-    return view('cashier.orders', compact('transactions'));
-}
+        return view('cashier.orders', compact('transactions'));
+    }
 
-    
+
 }

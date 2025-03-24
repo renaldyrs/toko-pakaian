@@ -11,7 +11,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\StoreProfileController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/products/{barcode}', [ProductController::class, 'findByBarcode']);
     
-use App\Http\Controllers\StoreProfileController;
+
 
 Route::prefix('store-profile')->group(function () {
     Route::get('/edit', [StoreProfileController::class, 'edit'])->name('store-profile.edit');
@@ -80,3 +80,4 @@ Route::post('/cashier', [CashierController::class, 'store'])->name('cashier.stor
 
 // Route untuk menampilkan invoice
 Route::get('/cashier/invoice/{id}', [CashierController::class, 'invoice'])->name('cashier.invoice');
+Route::get('/cashier/print/{id}', [CashierController::class, 'print'])->name('cashier.print');

@@ -83,3 +83,34 @@
     </div>
 </div>
 @endsection
+<script>
+    // Di dalam form submit handler
+fetch(route('cashier.store'), {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+    },
+    body: JSON.stringify({
+        payment_method_id: selectedPaymentMethod,
+        items: cartItems
+    })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.success) {
+        // Buka jendela print
+        const printWindow = window.open(data.invoice_url, '_blank');
+        
+        // Kosongkan keranjang
+        clearCart();
+        
+        // Fokus ke jendela print (untuk beberapa browser memblokir ini)
+        setTimeout(() => {
+            if (printWindow) {
+                printWindow.focus();
+            }
+        }, 1000);
+    }
+});
+</script>

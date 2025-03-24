@@ -19,7 +19,7 @@ class ReportController extends Controller
         // Query transaksi berdasarkan rentang tanggal
         $transactions = Transaction::whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         // Hitung total pendapatan
         $totalRevenue = $transactions->sum('total_amount');
