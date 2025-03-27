@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Request;
 
 class Product extends Model
 {
@@ -48,4 +49,6 @@ class Product extends Model
         $this->barcode = $this->code; // Gunakan kode produk sebagai barcode
         $this->save();
     }
+
+    
 }

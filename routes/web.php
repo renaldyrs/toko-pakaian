@@ -12,6 +12,9 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StoreProfileController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FinancialReportController;
+use App\Http\Controllers\ReturnController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -49,6 +52,7 @@ Route::get('/barcode/{code}', [ProductController::class, 'generateBarcode'])->na
 Route::prefix('reports')->group(function () {
     Route::get('/', [ReportController::class, 'index'])->name('reports.index');
 });
+Route::get('/reports/financial', [ReportController::class, 'financialReport'])->name('reports.financial');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
@@ -81,3 +85,22 @@ Route::post('/cashier', [CashierController::class, 'store'])->name('cashier.stor
 // Route untuk menampilkan invoice
 Route::get('/cashier/invoice/{id}', [CashierController::class, 'invoice'])->name('cashier.invoice');
 Route::get('/cashier/print/{id}', [CashierController::class, 'print'])->name('cashier.print');
+
+// routes/web.php
+Route::resource('expenses', ExpenseController::class)->middleware('auth');
+
+Route::prefix('financial-reports')->group(function() {
+    Route::get('/', [FinancialReportController::class, 'index'])->name('financial-reports.index');
+    Route::get('/export', [FinancialReportController::class, 'exportPdf'])->name('financial-reports.export');
+});
+
+Route::get('/products/print-barcodes/{id}', [ProductController::class, 'printBarcodes'])
+     ->name('products.print-barcodes');
+
+     Route::prefix('returns')->group(function() {
+        Route::get('/', [ReturnController::class, 'index'])->name('returns.index');
+        Route::get('/create/{transaction}', [ReturnController::class, 'create'])->name('returns.create');
+        Route::post('/', [ReturnController::class, 'store'])->name('returns.store');
+        Route::post('/{id}/approve', [ReturnController::class, 'approve'])->name('returns.approve');
+        Route::post('/{id}/reject', [ReturnController::class, 'reject'])->name('returns.reject');
+    });

@@ -50,6 +50,7 @@
                             Toko
                         </a>
                     </li>
+                    
                     <li class="mt-2">
                         <a href="{{ route('users.index') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,6 +61,7 @@
                             Pengguna
                         </a>
                     </li>
+
                     <li class="mt-2">
                         <a href="{{ route('categories.index') }}"
                             class="flex items-center p-2 hover:bg-gray-700 rounded">
@@ -70,6 +72,7 @@
                             Kategori
                         </a>
                     </li>
+
                     <li class="mt-2">
                         <a href="{{ route('suppliers.index') }}"
                             class="flex items-center p-2 hover:bg-gray-700 rounded">
@@ -81,6 +84,7 @@
                             Supplier
                         </a>
                     </li>
+
                     <li class="mt-2">
                         <a href="{{ route('products.index') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,6 +99,7 @@
             </li>
 
             <!-- Transaksi -->
+            
             <li class="mb-2">
                 <a href="{{ route('cashier.index') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,6 +108,28 @@
                         </path>
                     </svg>
                     Kasir
+                </a>
+            </li>
+
+            <li class="mb-2">
+                <a href="{{ route('expenses.index') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
+                        </path>
+                    </svg>
+                    Pengeluaran
+                </a>
+            </li>
+
+            <li class="mb-2">
+                <a href="{{ route('returns.index') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
+                        </path>
+                    </svg>
+                    Return
                 </a>
             </li>
 
@@ -117,6 +144,18 @@
                     Laporan
                 </a>
             </li>
+
+            <li class="mb-2">
+                <a href="{{ route('financial-reports.index') }}" class="flex items-center p-2 hover:bg-gray-700 rounded">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    Laporan Keuangan
+                </a>
+            </li>
+            
         </ul>
     </div>
 </aside>

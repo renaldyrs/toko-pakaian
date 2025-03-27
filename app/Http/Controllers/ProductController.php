@@ -138,5 +138,14 @@ class ProductController extends Controller
         return response($barcodeImage, Response::HTTP_OK, $headers);
     }
 
+    public function printBarcodes($id)
+    {
+        $products = Product::where('id', $id)
+        ->where('stock', '>', 0)
+            ->orderBy('name')
+            ->get();
+        return view('products.barcode', compact('products'));
+    }
+
     
 }

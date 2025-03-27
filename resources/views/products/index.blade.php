@@ -55,6 +55,9 @@
                             <i class="fas fa-trash"></i> Hapus
                         </button>
                     </form>
+                    <a href="{{ route('products.print-barcodes', $product->id) }}" class="text-green-500 hover:text-green-700" target="_blank">
+                        <i><i class="fas fa-barcode"></i> Barcode</i>
+                    </a>
                     
                 </td>
             </tr>

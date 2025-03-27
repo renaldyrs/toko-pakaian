@@ -28,4 +28,8 @@ class Transaction extends Model
     {
         return $this->hasMany(TransactionDetail::class);
     }
+    public function scopeDateRange($query, $startDate, $endDate)
+    {
+        return $query->whereBetween('created_at', [$startDate, $endDate]);
+    }
 }

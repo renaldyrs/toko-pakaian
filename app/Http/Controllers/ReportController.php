@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
@@ -22,10 +23,10 @@ class ReportController extends Controller
             ->paginate(10);
 
         // Hitung total pendapatan
-        $totalRevenue = $transactions->sum('total_amount');
+        $totalRevenue = Transaction::whereBetween('created_at', [$startDate, $endDate])->sum('total_amount');
 
         // Hitung jumlah transaksi
-        $totalTransactions = $transactions->count();
+        $totalTransactions = Transaction::whereBetween('created_at', [$startDate, $endDate])->count();
 
         // Kelompokkan transaksi berdasarkan metode pembayaran
         $paymentMethods = PaymentMethod::with(['transactions' => function ($query) use ($startDate, $endDate) {
@@ -42,4 +43,20 @@ class ReportController extends Controller
 
         return view('reports.index', compact('transactions', 'totalRevenue', 'totalTransactions', 'startDate', 'endDate', 'paymentMethods', 'revenueByPaymentMethod'));
     }
+
+    public function financialReport(Request $request)
+{
+    $startDate = $request->input('start_date');
+    $endDate = $request->input('end_date');
+    
+    $transactions = Transaction::with(['details', 'paymentMethod'])
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->get();
+    
+    $income = $transactions->sum('total_amount');
+    
+    
+    return view('reports.financial', compact('transactions', 'income'));
+}
+
 }
