@@ -19,6 +19,7 @@
         "vue": "^3.2.37"
     },
     "dependencies": {
+        "@tailwindcss/vite": "^4.0.17",
         "html5-qrcode": "^2.3.8"
     }
 }

@@ -18,7 +18,7 @@
         function playAddToCartSound() {
             // Coba gunakan file audio dulu
             const audio = new Audio('{{ asset("sounds/beep.mp3") }}');
-            audio.volume = 10;
+            audio.volume = 100;
 
             audio.play().catch(e => {
                 console.log("File audio blocked, falling back to beep");
@@ -104,134 +104,138 @@
             animation: shake 0.5s;
         }
     </style>
-    <!-- Ganti CDN dengan versi yang lebih stabil -->
+    
 
-    <div class="container">
+    <div class="container mx-auto p-4">
         <h1 class="text-3xl font-bold mb-6">Kasir</h1>
-        
-            <div class="row">
-                <div class="col-md-8 mb-4">
-                    <button id="startScanner" class="bg-green-500 text-white px-4 py-2 rounded-md mb-2">
-                        <i class="fas fa-barcode"></i> Aktifkan Scanner
-                    </button>
-                    <button id="stopScanner" class="bg-red-500 text-white px-4 py-2 rounded-md mb-2 hidden">
-                        <i class="fas fa-stop"></i> Matikan Scanner
-                    </button>
-                    <div id="scanner-container" class="hidden relative">
-                        <div id="interactive" class="viewport"></div>
-                        <div class="bg-black bg-opacity-50 text-white p-2 text-sm">
-                            Arahkan kamera ke barcode produk
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-md-4 mb-4">
-                    <div class="flex gap-2 mb-2">
-                        <input type="text" id="manualBarcode" placeholder="Masukkan barcode manual"
-                            class="flex-1 rounded-md border-gray-300 shadow-sm p-1" autocomplete="off">
-                        <button id="searchBarcode" class="bg-blue-500 text-white px-4 py-2 rounded-md">
-                            <i class="fas fa-plus"></i> Tambah
-                        </button>
+        <div class="grid grid-cols-1 md:grid-cols-2  ">
+            <div class="col-md-8 mb-4">
+                <button id="startScanner" class="bg-green-500 text-white px-4 py-2 rounded-md mb-2">
+                    <i class="fas fa-barcode"></i> Scan
+                </button>
+                <button id="stopScanner" class="bg-red-500 text-white px-4 py-2 rounded-md mb-2 hidden">
+                    <i class="fas fa-stop"></i> Close
+                </button>
+                <div id="scanner-container" class="hidden relative">
+                    <div id="interactive" class="viewport"></div>
+                    <div class="bg-black bg-opacity-50 text-white p-2 text-sm">
+                        Arahkan kamera ke barcode produk
                     </div>
-                    <div id="barcodeError" class="text-red-500 text-sm hidden"></div>
                 </div>
             </div>
-        
-        <div class="row">
-            <!-- Daftar Produk -->
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Pilih Produk</h5>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Nama Produk</th>
-                                    <th>Harga</th>
-                                    <th>Stok</th>
-                                    <th>Jumlah</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($products as $product)
-                                    <tr>
-                                        <td>{{ $product->name }}</td>
-                                        <td>Rp {{ number_format($product->price, 0, ',', '.') }}</td>
-                                        <td>{{ $product->stock }}</td>
-                                        <td>
-                                            <input type="number" id="quantity-{{ $product->id }}" class="form-control" min="1"
-                                                max="{{ $product->stock }}" value="1">
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-primary btn-sm add-to-cart"
-                                                data-product-id="{{ $product->id }}">
-                                                <i class="fas fa-cart-plus"></i> Tambah
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="flex gap-2 mb-2">
+                    <input type="text" id="manualBarcode" placeholder="Masukkan code"
+                        class="flex-1 rounded-md border-gray-300 shadow-sm p-2" autocomplete="off">
+                    <button id="searchBarcode" class="bg-blue-500 text-white px-4 py-2 rounded-md">
+                        <i class="fas fa-plus"></i> 
+                    </button>
                 </div>
+                <div id="barcodeError" class="text-red-500 text-sm hidden"></div>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-4">
+            <!-- Daftar Produk -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden  md:w-full">
+                <table class="min-w-full">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-5 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Nama Produk</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Harga</th>
+                            <th class=" text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Stok</th>
+                            <th class=" text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Jumlah</th>
+                            <th class="pr-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        @foreach ($products as $product)
+                            <tr>
+                                <td class="text-center">{{ $product->name }}</td>
+                                <td class="text-center">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
+                                <td class="text-center">{{ $product->stock }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <input type="number" id="quantity-{{ $product->id }}" class="form-control text-center" min="1"
+                                        max="{{ $product->stock }}" value="1">
+                                </td>
+                                <td class=" text-center">
+                                    <button type="button" class="btn btn-primary btn-sm add-to-cart"
+                                        data-product-id="{{ $product->id }}">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
             </div>
 
             <!-- Keranjang Belanja -->
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Keranjang Belanja</h5>
-                        <table class="table" id="cartTable">
-                            <thead>
-                                <tr>
-                                    <th>Produk</th>
-                                    <th>Jumlah</th>
-                                    <th>Subtotal</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Item keranjang akan ditambahkan di sini oleh JavaScript -->
-                            </tbody>
-                            <tfoot>
-                                <tr data-product-id="{{ $product->id }}">
-                                    <th colspan="2">Total</th>
-                                    <th id="cartTotal">Rp 0</th>
-                                </tr>
-                                <tr>
-                                    <th colspan="2">Uang Bayar</th>
-                                    <th>
-                                        <input type="number" id="paymentAmount" class="form-control" min="0"
-                                            placeholder="Masukkan uang bayar">
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <th colspan="2">Kembalian</th>
-                                    <th id="changeAmount">Rp 0</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                        <form id="cashierForm" action="{{ route('cashier.store') }}" method="POST">
-                            @csrf
-                            <div class="form-group">
-                                <label for="payment_method_id">Metode Pembayaran</label>
-                                <select name="payment_method_id" id="payment_method_id" class="form-control" required>
-                                    <option value="">Pilih Metode Pembayaran</option>
-                                    @foreach ($paymentMethods as $method)
-                                        <option value="{{ $method->id }}">{{ $method->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <input type="hidden" name="payment_amount" id="paymentAmountInput">
-                            <input type="hidden" name="change_amount" id="changeAmountInput">
-
-                            <button onclick="processPayment()" class="btn btn-success btn-block submit">
-                                <i class="fas fa-check"></i> Proses Pembayaran
-                            </button>
-                        </form>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden ">
+                <h5 class="text-xl font-bold mb-3 pt-2 pl-2 text-center">Keranjang Belanja</h5>
+                <table class="min-w-full" id="cartTable">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Produk</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td><br></td>
+                            <td><br></td>
+                            <td><br></td>
+                            <td><br></td>
+                        </tr>
+                        <!-- Item keranjang akan ditambahkan di sini oleh JavaScript -->
+                    </tbody>
+                    <tfoot>
+                        <tr data-product-id="{{ $product->id }}">
+                            <th colspan="2">Total</th>
+                            <th id="cartTotal">Rp 0</th>
+                        </tr>
+                        <tr>
+                            <th colspan="2">Uang Bayar</th>
+                            <th>
+                                <input type="number" id="paymentAmount" class="form-control" min="0"
+                                    placeholder="Masukkan uang bayar">
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="2">Kembalian</th>
+                            <th id="changeAmount">Rp 0</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <form id="cashierForm" action="{{ route('cashier.store') }}" method="POST">
+                    @csrf
+                    <div class="form-group">
+                        <label for="payment_method_id">Metode Pembayaran</label>
+                        <select name="payment_method_id" id="payment_method_id" class="form-control" required>
+                            <option value="">Pilih Metode Pembayaran</option>
+                            @foreach ($paymentMethods as $method)
+                                <option value="{{ $method->id }}">{{ $method->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                </div>
+                    <input type="hidden" name="payment_amount" id="paymentAmountInput">
+                    <input type="hidden" name="change_amount" id="changeAmountInput">
+
+                    <button onclick="processPayment()" class="btn btn-success btn-block submit">
+                        <i class="fas fa-check"></i> Proses Pembayaran
+                    </button>
+                </form>
+
             </div>
 
             <!-- Struk Pesanan -->

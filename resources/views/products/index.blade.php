@@ -10,61 +10,73 @@
         </button>
 
         <!-- Tabel Daftar Produk -->
-<div class="bg-white rounded-lg shadow-md overflow-hidden">
-    <table class="min-w-full">
-        <thead class="bg-gray-200">
-            <tr>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Gambar</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Kode Produk</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Barcode</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Produk</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-            @foreach ($products as $product)
-            <tr>
-                <td class="px-6 py-4 grid justify-items-center">
-                    @if ($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-16 h-16 object-cover rounded">
-                    @else
-                        <span class="text-gray-400">Tidak ada gambar</span>
-                    @endif
-                </td>
-                <td class="px-6 py-4 text-center">{{ $product->code }}</td>
-                <td class="px-6 py-4 grid justify-items-center">
-                    @if ($product->barcode)
-                        <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($product->barcode, 'C128') }}" alt="barcode" class="w-32 h-12 ">
-                    @else
-                        <span class="text-gray-400">Tidak ada barcode</span>
-                    @endif
-                </td>
-                <td class="px-6 py-4 text-center">{{ $product->name }}</td>
-                <td class="px-6 py-4 text-center">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
-                <td class="px-6 py-4 text-center">{{ $product->stock }}</td>
-                <td class="px-6 py-4 text-center">
-                    <a href="{{ route('products.edit', $product->id) }}" class="text-blue-500 hover:text-blue-700 mr-2">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>
-                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-500 hover:text-red-700" onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
-                            <i class="fas fa-trash"></i> Hapus
-                        </button>
-                    </form>
-                    <a href="{{ route('products.print-barcodes', $product->id) }}" class="text-green-500 hover:text-green-700" target="_blank">
-                        <i><i class="fas fa-barcode"></i> Barcode</i>
-                    </a>
-                    
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="min-w-full">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Gambar
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Kode
+                            Produk</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Barcode
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Nama
+                            Produk</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Harga
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Stok
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach ($products as $product)
+                        <tr>
+                            <td class="px-6 py-4 grid justify-items-center">
+                                @if ($product->image)
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                                        class="w-16 h-16 object-cover rounded">
+                                @else
+                                    <span class="text-gray-400">Tidak ada gambar</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">{{ $product->code }}</td>
+                            <td class="px-6 py-4 grid justify-items-center">
+                                @if ($product->barcode)
+                                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($product->barcode, 'C128') }}"
+                                        alt="barcode" class="w-32 h-12 ">
+                                @else
+                                    <span class="text-gray-400">Tidak ada barcode</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">{{ $product->name }}</td>
+                            <td class="px-6 py-4 text-center">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
+                            <td class="px-6 py-4 text-center">{{ $product->stock }}</td>
+                            <td class="px-6 py-4 text-center">
+                                <a href="{{ route('products.edit', $product->id) }}"
+                                    class="text-blue-500 hover:text-blue-700 mr-2">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-500 hover:text-red-700"
+                                        onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
+                                        <i class="fas fa-trash"></i> Hapus
+                                    </button>
+                                </form>
+                                <a href="{{ route('products.print-barcodes', $product->id) }}"
+                                    class="text-green-500 hover:text-green-700" target="_blank">
+                                    <i><i class="fas fa-barcode"></i> Barcode</i>
+                                </a>
+
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
         <!-- Modal Tambah Produk -->
         <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center">

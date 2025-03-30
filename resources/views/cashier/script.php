@@ -1,4 +1,3 @@
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -61,8 +60,8 @@
             cart.forEach(item => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                                            <td>${item.name}</td>
-                                            <td>
+                                            <td class="px-6 py-4 text-center">${item.name}</td>
+                                            <td class="px-4 py-4 text-center">
                                                 <button type="button" class="text-blue-500 hover:text-blue-700 decrease-quantity" data-product-id="${item.productId}">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
@@ -72,8 +71,8 @@
                                                 </button>
 
                                             </td>
-                                            <td>Rp ${item.subtotal.toLocaleString()}</td>
-                                            <td>
+                                            <td class="px-6 py-4 text-center">Rp ${item.subtotal.toLocaleString()}</td>
+                                            <td class="px-6 py-4 text-center">
                                                 <button type="button" class="text-red-500 hover:text-red-700 remove-from-cart" data-product-id="${item.productId}">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
@@ -214,4 +213,3 @@
 
     });
 </script>
-

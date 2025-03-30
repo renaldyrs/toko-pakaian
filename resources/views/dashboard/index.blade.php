@@ -2,13 +2,13 @@
 
 @section('content')
     <div class="container mx-auto p">
-        <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+        <h1 class="text-3xl font-bold mb-6 dark:text-white">Dashboard</h1>
 
 
         <!-- Statistik Summary -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- Total Pendapatan -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden dark:bg-gray-800 ">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
@@ -16,7 +16,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500">Total Pendapatan</p>
-                            <p class="text-2xl font-bold text-gray-800">Rp {{ number_format($income, 0, ',', '.') }}</p>
+                            <p class="text-2xl font-bold text-gray-800 dark:text-white">Rp {{ number_format($income, 0, ',', '.') }}</p>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -26,7 +26,7 @@
             </div>
 
             <!-- Total Pengeluaran -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden dark:bg-gray-800 ">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
@@ -34,7 +34,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500">Total Pengeluaran</p>
-                            <p class="text-2xl font-bold text-gray-800">Rp {{ number_format($expenses, 0, ',', '.') }}</p>
+                            <p class="text-2xl font-bold text-gray-800 dark:text-white">Rp {{ number_format($expenses, 0, ',', '.') }}</p>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -44,7 +44,7 @@
             </div>
 
             <!-- Laba Bersih -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden dark:bg-gray-800">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
@@ -66,14 +66,14 @@
         </div>
 
         <!-- Card Statistik -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8  ">
             <!-- Total Transaksi Hari Ini -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden dark:bg-gray-800">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Total Transaksi Hari Ini</p>
-                            <p class="text-2xl font-bold text-black-600">
+                            <p class="text-2xl font-bold text-black-600 dark:text-white">
                             {{ $todayTransactions }}
                             </p>
                         </div>
@@ -82,12 +82,12 @@
             </div>
 
             <!-- Total Pendapatan Hari Ini -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden dark:bg-gray-800">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Total Pendapatan Hari Ini</p>
-                            <p class="text-2xl font-bold text-black-600 ">
+                            <p class="text-2xl font-bold text-black-600 dark:text-white">
                             Rp {{ number_format($todayRevenue, 0, ',', '.') }}
                             </p>
                         </div>
@@ -96,12 +96,12 @@
             </div>
 
             <!-- Produk Terlaris -->
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden dark:bg-gray-800">
                 <div class="p-6">
                     <div class="flex items-center">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Produk Terlaris</p>
-                            <p class="text-2xl font-bold text-black-600 ">
+                            <p class="text-2xl font-bold text-black-600 dark:text-white">
                             @if ($bestSellingProduct)
                         {{ $bestSellingProduct->product->name }} ({{ $bestSellingProduct->total_sold }} terjual)
                     @else
@@ -116,16 +116,16 @@
         </div>
 
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 ">
             <!-- Grafik Transaksi -->
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4">Grafik Transaksi (7 Hari Terakhir)</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8 dark:bg-gray-800">
+                <h2 class="text-xl font-semibold text-gray-300 mb-4">Grafik Transaksi (7 Hari Terakhir)</h2>
                 <canvas id="transactionChart" class="w-full" height="200"></canvas>
             </div>
 
             <!-- Grafik Pendapatan -->
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4">Grafik Pendapatan (7 Hari Terakhir)</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8 dark:bg-gray-800">
+                <h2 class="text-xl font-semibold text-gray-300 mb-4">Grafik Pendapatan (7 Hari Terakhir)</h2>
                 <canvas id="revenueChart" class="w-full" height="200"></canvas>
             </div>
         </div>
