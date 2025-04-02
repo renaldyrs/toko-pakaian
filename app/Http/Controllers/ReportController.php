@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use App\Models\PaymentMethod;
+use App\Models\Expense;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -13,50 +14,114 @@ class ReportController extends Controller
     // Menampilkan halaman laporan keuangan
     public function index(Request $request)
     {
-        // Ambil parameter filter dari request
-        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
-        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
+        // Default: 7 hari terakhir
+        $startDate = $request->start_date ?? Carbon::now()->subDays(7)->format('Y-m-d');
+        $endDate = $request->end_date ?? Carbon::now()->format('Y-m-d');
 
-        // Query transaksi berdasarkan rentang tanggal
-        $transactions = Transaction::whereBetween('created_at', [$startDate, $endDate])
+        $transactions = Transaction::with(['details.product', 'paymentMethod'])
+            ->whereBetween('created_at', [$startDate, $endDate.' 23:59:59'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Hitung total pendapatan
-        $totalRevenue = Transaction::whereBetween('created_at', [$startDate, $endDate])->sum('total_amount');
+        // Hitung statistik
+        $totalTransactions = $transactions->count();
+        $totalRevenue = $transactions->sum('total_amount');
+        $mostSoldProduct = $this->getMostSoldProduct($transactions);
 
-        // Hitung jumlah transaksi
-        $totalTransactions = Transaction::whereBetween('created_at', [$startDate, $endDate])->count();
+        return view('reports.index', compact(
+            'transactions',
+            'startDate',
+            'endDate',
+            'totalTransactions',
+            'totalRevenue',
+            'mostSoldProduct'
+        ));
+    }
 
-        // Kelompokkan transaksi berdasarkan metode pembayaran
-        $paymentMethods = PaymentMethod::with(['transactions' => function ($query) use ($startDate, $endDate) {
-            if ($startDate && $endDate) {
-                $query->whereBetween('created_at', [$startDate, $endDate]);
+    private function getMostSoldProduct($transactions)
+    {
+        $products = [];
+        
+        foreach ($transactions as $transaction) {
+            foreach ($transaction->details as $detail) {
+                $productId = $detail->product_id;
+                $products[$productId] = [
+                    'name' => $detail->product->name,
+                    'sold' => ($products[$productId]['sold'] ?? 0) + $detail->quantity
+                ];
             }
-        }])->get();
-
-        // Hitung total pendapatan per metode pembayaran
-        $revenueByPaymentMethod = [];
-        foreach ($paymentMethods as $method) {
-            $revenueByPaymentMethod[$method->name] = $method->transactions->sum('total_amount');
         }
 
-        return view('reports.index', compact('transactions', 'totalRevenue', 'totalTransactions', 'startDate', 'endDate', 'paymentMethods', 'revenueByPaymentMethod'));
+        if (!empty($products)) {
+            usort($products, function ($a, $b) {
+                return $b['sold'] <=> $a['sold'];
+            });
+            return $products[0];
+        }
+
+        return null;
     }
 
     public function financialReport(Request $request)
-{
-    $startDate = $request->input('start_date');
-    $endDate = $request->input('end_date');
-    
-    $transactions = Transaction::with(['details', 'paymentMethod'])
-        ->whereBetween('created_at', [$startDate, $endDate])
-        ->get();
-    
-    $income = $transactions->sum('total_amount');
-    
-    
-    return view('reports.financial', compact('transactions', 'income'));
-}
+    {
+        // Default periode: bulan ini
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
+
+        // Validasi tanggal
+        if ($startDate > $endDate) {
+            return redirect()->back()->withErrors('Tanggal mulai tidak boleh lebih besar dari tanggal akhir');
+        }
+
+        // Query data transaksi
+        $transactions = Transaction::with(['paymentMethod', 'details.product'])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+
+        // Hitung summary
+        $totalPendapatan = $transactions->sum('total_amount');
+        $totalTransaksi = $transactions->count();
+        $averageTransaction = $totalTransaksi > 0 ? $totalPendapatan / $totalTransaksi : 0;
+
+        // Data untuk chart
+        $chartData = $this->generateChartData($startDate, $endDate);
+
+        return view('reports.financial', compact(
+            'transactions',
+            'startDate',
+            'endDate',
+            'totalPendapatan',
+            'totalTransaksi',
+            'averageTransaction',
+            'chartData'
+        ));
+    }
+    private function generateChartData($startDate, $endDate)
+    {
+        $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
+        $chartLabels = [];
+        $chartIncome = [];
+        $chartTransactions = [];
+
+        foreach ($period as $date) {
+            $chartLabels[] = $date->format('d M');
+            
+            $income = Transaction::whereDate('created_at', $date)
+                ->sum('total_amount');
+            $chartIncome[] = $income;
+
+            $transactionCount = Transaction::whereDate('created_at', $date)
+                ->count();
+            $chartTransactions[] = $transactionCount;
+        }
+
+        return [
+            'labels' => $chartLabels,
+            'income' => $chartIncome,
+            'transactions' => $chartTransactions
+        ];
+    }
 
 }

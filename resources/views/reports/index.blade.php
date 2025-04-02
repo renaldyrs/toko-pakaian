@@ -1,179 +1,161 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h1 class="text-3xl font-bold mb-6">Laporan Pesanan</h1>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Laporan Pesanan</h1>
+            
+                <button onclick="window.print()" class="h-10 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                    <i class="fas fa-print mr-2"></i>Cetak
+                </button>
+            
+        </div>
 
-        <!-- Filter Tanggal -->
-        <form action="{{ route('reports.index') }}" method="GET" class="mb-4">
-            <div class="row">
-                <div class="col-md-4">
-                    <label for="start_date">Tanggal Mulai</label>
-                    <input type="date" name="start_date" id="start_date" class="form-control" value="{{ $startDate }}">
-                </div>
-                <div class="col-md-4">
-                    <label for="end_date">Tanggal Selesai</label>
-                    <input type="date" name="end_date" id="end_date" class="form-control" value="{{ $endDate }}">
-                </div>
-                <div class="col-md-4 align-self-end">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                </div>
+        <!-- Statistik -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-500">
+                <h3 class="text-gray-500 font-medium">Total Transaksi</h3>
+                <p class="text-3xl font-bold">{{ $totalTransactions }}</p>
             </div>
-        </form>
-
-        <!-- Ringkasan Laporan -->
-        <div class="card mb-4 shadow">
-            <div class="card-body">
-                <h5 class="text-xl font-bold mb-4">Ringkasan Laporan</h5>
-                <p>Total Pendapatan: <strong>Rp {{ number_format($totalRevenue, 0, ',', '.') }}</strong></p>
-                <p>Jumlah Transaksi: <strong>{{ $totalTransactions }}</strong></p>
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500">
+                <h3 class="text-gray-500 font-medium">Total Pendapatan</h3>
+                <p class="text-3xl font-bold">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-purple-500">
+                <h3 class="text-gray-500 font-medium">Produk Terlaris</h3>
+                <p class="text-2xl font-bold">
+                    {{ $mostSoldProduct['name'] ?? '-' }}
+                    <span class="text-lg text-purple-600">
+                        ({{ $mostSoldProduct['sold'] ?? 0 }} terjual)
+                    </span>
+                </p>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border-l-4 border-purple-500 pt-4">
+                <form method="GET" class="flex items-center space-x-4 p-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Dari Tanggal</label>
+                        <input type="date" name="start_date" value="{{ $startDate }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Sampai Tanggal</label>
+                        <input type="date" name="end_date" value="{{ $endDate }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow">
+                    </div>
+                    <button type="submit" class="mt-6  p-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        <i class="fas fa-filter mr-2"></i>
+                    </button>
+                </form>
             </div>
         </div>
 
-        <!-- <div class="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 class="text-xl font-bold mb-4">Total Pendapatan per Metode Pembayaran</h2>
-                <table class="min-w-full">
-                    <thead class="bg-gray-200">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metode
-                                Pembayaran</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total
-                                Pendapatan</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        @foreach ($revenueByPaymentMethod as $method => $revenue)
-                            <tr>
-                                <td class="px-6 py-4">{{ $method }}</td>
-                                <td class="px-6 py-4">Rp {{ number_format($revenue, 0, ',', '.') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div> -->
-
-        <!-- Daftar Transaksi -->
-
-        <div class="bg-white rounded-xl shadow overflow-hidden mb-8 p-3">
-            <h5 class="text-xl font-bold mb-3 pt-2 pl-2">Daftar Transaksi</h5>
+        <!-- Tabel Pesanan -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 ">
-                    <thead class="bg-gray-300">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col"
-                                class="px-6 py-3 text-left text-xs font-bold text-black-500 uppercase tracking-wider">
-                                No. Invoice
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Invoice</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tanggal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items
                             </th>
-                            <th scope="col"
-                                class="px-6 py-3 text-left text-xs font-bold text-black-500 uppercase tracking-wider">
-                                Tanggal
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total
                             </th>
-                            <th scope="col"
-                                class="px-6 py-3 text-left text-xs font-bold text-black-500 uppercase tracking-wider">
-                                Total
-                            </th>
-                            <th scope="col"
-                                class="px-6 py-3 text-left text-xs font-bold text-black-500 uppercase tracking-wider">
-                                Metode Pembayaran
-                            </th>
-                            <th scope="col"
-                                class="px-6 py-3 text-right text-xs font-bold text-black-500 uppercase tracking-wider">
-                                Aksi
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Pembayaran</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach ($transactions as $transaction)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        @forelse ($transactions as $transaction)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap font-mono text-sm text-blue-600">
                                     {{ $transaction->invoice_number }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {{ $transaction->created_at->format('d M Y H:i:s') }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm  text-gray-500">
-                                    <span class="text-green-600 font-medium">Rp
-                                        {{ number_format($transaction->total_amount, 0, ',', '.') }}</span>
-                                </td>
-
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    @if ($transaction->payment_method_id == '1')
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            Tunai
-                                        </span>
-                                    @elseif ($transaction->payment_method_id == '2')
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                            Transfer Bank
-                                        </span>
-                                    @else
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            Qris
-                                        </span>
-                                    @endif
-
+                                    {{ $transaction->created_at->format('d M Y H:i') }}
                                 </td>
-
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-wrap gap-1">
+                                        @foreach ($transaction->details as $detail)
+                                            <span class="px-2 py-1 bg-gray-100 text-xs rounded-full">
+                                                {{ $detail->product->name }} ({{ $detail->quantity }})
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap font-medium">
+                                    Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full 
+                                              @if($transaction->paymentMethod->name == 'Tunai') bg-green-100 text-green-800
+                                              @elseif($transaction->paymentMethod->name == 'Transfer Bank') bg-blue-100 text-blue-800
+                                              @else bg-purple-100 text-purple-800 @endif">
+                                        {{ $transaction->paymentMethod->name }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <a href="{{ route('cashier.invoice', $transaction->id) }}"
-                                        class="text-blue-600 hover:text-blue-900 mr-3"><i class="fas fa-eye"></i></a>
-                                    <a href="#" class="text-gray-600 hover:text-gray-900"><i class="fas fa-print"></i></a>
-                                    <a href="{{ route('returns.create', $transaction->id) }}"
-                                        class="text-yellow-600 hover:text-yellow-800">
-                                        Buat Retur
+                                        class="text-blue-600 hover:text-blue-900 mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="#" class="text-gray-500 hover:text-gray-700">
+                                        <i class="fas fa-print"></i>
                                     </a>
                                 </td>
-
                             </tr>
-
-                        @endforeach
-
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    Tidak ada data transaksi pada periode ini
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
-                    <tfoot class="bg-gray-50">
-
-                    </tfoot>
                 </table>
-                <div class="mt-4">
-                    {{ $transactions->appends([
-        'start_date' => request('start_date'),
-        'end_date' => request('end_date')
-    ])->links() }}
-                </div>
             </div>
         </div>
 
+        <!-- Pagination -->
+        @if($transactions->hasPages())
+            <div class="mt-6">
+                {{ $transactions->appends(request()->query())->links() }}
+            </div>
+        @endif
     </div>
 @endsection
-<script>
-    // Di dalam form submit handler
-    fetch(route('cashier.store'), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify({
-            payment_method_id: selectedPaymentMethod,
-            items: cartItems
-        })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Buka jendela print
-                const printWindow = window.open(data.invoice_url, '_blank');
+<!-- Print Styles -->
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
 
-                // Kosongkan keranjang
-                clearCart();
+        .container,
+        .container * {
+            visibility: visible;
+        }
 
-                // Fokus ke jendela print (untuk beberapa browser memblokir ini)
-                setTimeout(() => {
-                    if (printWindow) {
-                        printWindow.focus();
-                    }
-                }, 1000);
-            }
-        });
-</script>
+        .container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 0;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        table {
+            width: 100% !important;
+            font-size: 12px !important;
+        }
+    }
+</style>

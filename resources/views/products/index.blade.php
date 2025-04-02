@@ -14,6 +14,8 @@
             <table class="min-w-full">
                 <thead class="bg-gray-200">
                     <tr>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">No
+                    </th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Gambar
                         </th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Kode
@@ -33,6 +35,7 @@
                 <tbody class="divide-y divide-gray-200">
                     @foreach ($products as $product)
                         <tr>
+                        <td class="px-6 py-4 text-center">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 grid justify-items-center">
                                 @if ($product->image)
                                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
@@ -55,27 +58,35 @@
                             <td class="px-6 py-4 text-center">{{ $product->stock }}</td>
                             <td class="px-6 py-4 text-center">
                                 <a href="{{ route('products.edit', $product->id) }}"
-                                    class="text-blue-500 hover:text-blue-700 mr-2">
-                                    <i class="fas fa-edit"></i> Edit
+                                    class="text-blue-500 m-1 hover:text-blue-700 ">
+                                    <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-500 hover:text-red-700"
+                                    <button type="submit" class="text-red-500 m-1 hover:text-red-700"
                                         onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
-                                        <i class="fas fa-trash"></i> Hapus
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
                                 <a href="{{ route('products.print-barcodes', $product->id) }}"
-                                    class="text-green-500 hover:text-green-700" target="_blank">
-                                    <i><i class="fas fa-barcode"></i> Barcode</i>
+                                    class="text-green-500 m-1 hover:text-green-700" target="_blank">
+                                    <i class="fas fa-barcode"></i>
                                 </a>
 
                             </td>
                         </tr>
+                        
                     @endforeach
+                    
                 </tbody>
             </table>
+            <hr>
+
+            <div class="p-4">
+            
+            {{ $products->links() }}
+            </div>
         </div>
 
         <!-- Modal Tambah Produk -->

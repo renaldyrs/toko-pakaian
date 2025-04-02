@@ -15,7 +15,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['category'])->get();
+        $products = Product::with(['category'])->paginate(5);
         $categories = Category::all();
         $suppliers = Supplier::all();
         return view('products.index', compact('products', 'categories', 'suppliers'));

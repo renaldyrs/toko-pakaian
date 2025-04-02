@@ -11,7 +11,8 @@ class CategoryController extends Controller
     // Menampilkan daftar kategori
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::latest()
+        ->paginate(5);
         return view('categories.index', compact('categories'));
     }
 
