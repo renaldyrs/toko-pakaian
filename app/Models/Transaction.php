@@ -15,6 +15,7 @@ class Transaction extends Model
         'payment_amount',
         'change_amount',
         'payment_method_id',
+        'user_id',
     ];
 
     // Relasi ke PaymentMethod
@@ -27,6 +28,12 @@ class Transaction extends Model
     public function details()
     {
         return $this->hasMany(TransactionDetail::class);
+    }
+
+    // Relasi ke User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
     public function scopeDateRange($query, $startDate, $endDate)
     {

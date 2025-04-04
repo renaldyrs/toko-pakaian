@@ -17,7 +17,7 @@ use App\Http\Controllers\FinancialReportController;
 use App\Http\Controllers\ReturnController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Auth::routes();
@@ -45,6 +45,8 @@ Route::prefix('cashier')->group(function () {
     Route::get('/invoice/{id}', [CashierController::class, 'invoice'])->name('cashier.invoice');
     Route::get('/invoice/{id}/print', [CashierController::class, 'printInvoice'])->name('cashier.invoice.print');
     Route::get('/orders', [CashierController::class, 'orders'])->name('cashier.orders'); // Route untuk daftar pesanan
+    Route::get('/receipt/{id}', [CashierController::class, 'showReceipt'])->name('cashier.receipt');
+    Route::get('/print/{id}', [CashierController::class, 'printReceipt'])->name('cashier.print');
 });
 
 Route::post('/cashier/add-to-cart', [CashierController::class, 'addToCart'])->name('cashier.addToCart');
@@ -61,14 +63,14 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
 });
 
- 
-    Route::resource('users', UserController::class);
-    Route::get('/products/{id}/download-barcode', [ProductController::class, 'downloadBarcode'])->name('products.downloadBarcode');
 
-    Route::get('/products/find-by-code{code}', [ProductController::class, 'findByCode'])->name('products.find-by-code');
+Route::resource('users', UserController::class);
+Route::get('/products/{id}/download-barcode', [ProductController::class, 'downloadBarcode'])->name('products.downloadBarcode');
+
+Route::get('/products/find-by-code{code}', [ProductController::class, 'findByCode'])->name('products.find-by-code');
 
 Route::get('/products/{barcode}', [ProductController::class, 'findByBarcode']);
-    
+
 
 
 Route::prefix('store-profile')->group(function () {
@@ -89,18 +91,18 @@ Route::get('/cashier/print/{id}', [CashierController::class, 'print'])->name('ca
 // routes/web.php
 Route::resource('expenses', ExpenseController::class)->middleware('auth');
 
-Route::prefix('financial-reports')->group(function() {
+Route::prefix('financial-reports')->group(function () {
     Route::get('/', [FinancialReportController::class, 'index'])->name('financial-reports.index');
     Route::get('/export', [FinancialReportController::class, 'exportPdf'])->name('financial-reports.export');
 });
 
 Route::get('/products/print-barcodes/{id}', [ProductController::class, 'printBarcodes'])
-     ->name('products.print-barcodes');
+    ->name('products.print-barcodes');
 
-     Route::prefix('returns')->group(function() {
-        Route::get('/', [ReturnController::class, 'index'])->name('returns.index');
-        Route::get('/create/{transaction}', [ReturnController::class, 'create'])->name('returns.create');
-        Route::post('/', [ReturnController::class, 'store'])->name('returns.store');
-        Route::post('/{id}/approve', [ReturnController::class, 'approve'])->name('returns.approve');
-        Route::post('/{id}/reject', [ReturnController::class, 'reject'])->name('returns.reject');
-    });
+Route::prefix('returns')->group(function () {
+    Route::get('/', [ReturnController::class, 'index'])->name('returns.index');
+    Route::get('/create/{transaction}', [ReturnController::class, 'create'])->name('returns.create');
+    Route::post('/', [ReturnController::class, 'store'])->name('returns.store');
+    Route::post('/{id}/approve', [ReturnController::class, 'approve'])->name('returns.approve');
+    Route::post('/{id}/reject', [ReturnController::class, 'reject'])->name('returns.reject');
+});

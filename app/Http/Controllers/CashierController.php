@@ -6,6 +6,9 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\PaymentMethod;
+use App\Models\Category;
+use DB;
+use Log;
 
 use App\Models\User;
 use App\Models\StoreProfile;
@@ -25,95 +28,92 @@ class CashierController extends Controller
         $products = Product::where('stock', '>', 0)->get();
         $storeProfile = StoreProfile::first();
         $paymentMethods = PaymentMethod::all();
-        return view('cashier.index', compact('products', 'paymentMethods', 'storeProfile'));
+        $categories = Category::all();
+        return view('cashier.index', compact('products', 'paymentMethods', 'storeProfile', 'categories'));
     }
 
     // Menyimpan transaksi
     public function store(Request $request)
     {
+        try {
+            DB::beginTransaction();
 
-        // Konversi JSON string items ke array
-        $items = json_decode($request->items, true);
-
-        // Validasi input
-        $request->validate([
-            'payment_method_id' => 'required|exists:payment_methods,id',
-            'items' => 'required|json', // Pastikan items adalah JSON string
-        ]);
-
-        // Debug: Tampilkan data request
-        \Log::info('Request data:', $request->all());
-
-        // Konversi JSON string items ke array
-        $items = json_decode($request->items, true);
-
-        // Periksa apakah json_decode berhasil
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return redirect()->back()->with('error', 'Format items tidak valid.');
-        }
-
-        // Validasi manual untuk items
-        if (!is_array($items)) {
-            return redirect()->back()->with('error', 'Data items harus berupa array.');
-        }
-
-        foreach ($items as $item) {
-            $validator = Validator::make($item, [
-                'product_id' => 'required|exists:products,id',
-                'quantity' => 'required|integer|min:1',
-                'subtotal' => 'required|numeric',
+            $validator = Validator::make($request->all(), [
+                'items' => 'required|array|min:1',
+                'items.*.id' => 'required|exists:products,id',
+                'items.*.quantity' => 'required|integer|min:1',
+                'payment_method_id' => 'required|exists:payment_methods,id',
             ]);
 
             if ($validator->fails()) {
-                return redirect()->back()->with('error', 'Data items tidak valid.');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
             }
-        }
 
-        // Cek stok produk
-        foreach ($items as $item) {
-            $product = Product::find($item['product_id']);
-            if ($item['quantity'] > $product->stock) {
-                return redirect()->back()->with('error', `Stok produk ${$product->name} tidak mencukupi. Stok tersedia: ${$product->stock}`);
+            // Cek stok semua produk sebelum memproses
+            foreach ($request->items as $item) {
+                $product = Product::find($item['id']);
+                if ($product->stock < $item['quantity']) {
+                    throw new \Exception("Stok produk {$product->name} tidak mencukupi");
+                }
             }
-        }
 
-        // Generate nomor invoice
-        $invoiceNumber = 'INV-' . Str::upper(Str::random(8));
+            // Generate invoice number
+            $invoiceNumber = 'INV-' . date('YmdHis') . '-' . Str::random(4);
 
-        // Hitung total amount
-        $totalAmount = collect($items)->sum('subtotal');
+            // Create transaction
+            $transaction = new Transaction();
+            $transaction->invoice_number = $invoiceNumber;
+            $transaction->total_amount = 0; // Akan diupdate
+            $transaction->payment_method_id = $request->payment_method_id;
+            $transaction->user_id = auth()->id();
+            $transaction->save();
 
-        // Simpan transaksi
-        $transaction = Transaction::create([
-            'invoice_number' => $invoiceNumber,
-            'total_amount' => $totalAmount,
-            'payment_amount' => $request->payment_amount,
-            'change_amount' => $request->change_amount,
-            'payment_method_id' => $request->payment_method_id,
-        ]);
+            $total = 0;
+            foreach ($request->items as $item) {
+                $product = Product::lockForUpdate()->find($item['id']);
+                $subtotal = $product->price * $item['quantity'];
 
-        \Log::info('Transaksi disimpan:', $transaction->toArray()); // Log transaksi
+                $transaction->details()->create([
+                    'product_id' => $product->id,
+                    'quantity' => $item['quantity'],
+                    'price' => $product->price,
+                    'subtotal' => $subtotal,
+                ]);
 
-        // Simpan detail transaksi
-        foreach ($items as $item) {
-            $detail = TransactionDetail::create([
-                'transaction_id' => $transaction->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'price' => $item['price'],
-                'subtotal' => $item['subtotal'],
+                $product->stock -= $item['quantity'];
+                $product->save();
+
+                $total += $subtotal;
+            }
+
+            $transaction->total_amount = $total;
+            $transaction->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'transaction' => $transaction->load('details.product', 'paymentMethod', 'user'),
+                'message' => 'Transaksi berhasil diproses'
             ]);
 
-            \Log::info('Detail transaksi disimpan:', $detail->toArray()); // Log detail transaksi
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-            // Kurangi stok produk
-            $product = Product::find($item['product_id']);
-            $product->stock -= $item['quantity'];
-            $product->save();
+            Log::error('Transaction error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memproses pembayaran: ' . $e->getMessage()
+            ], 500);
         }
-        alert('Pembayaran berhasil!');
-        return redirect()->route('cashier.print', $transaction->id)
-        ->with('print', true);
     }
 
     public function print($id)
@@ -132,48 +132,33 @@ class CashierController extends Controller
         $products = Product::where('stock', '>', 0)->get();
         $paymentMethods = PaymentMethod::all();
         $transaction = Transaction::with(['details.product', 'paymentMethod'])->findOrFail($id);
-        return view('cashier.invoice', compact('transaction', 'storeProfile', 'paymentMethods', 'products'));
+        return view('cashier.print', compact('transaction', 'storeProfile', 'paymentMethods', 'products'));
     }
 
     // Generate PDF invoice
     public function printInvoice($id)
     {
         $transaction = Transaction::with(['details.product', 'paymentMethod'])->findOrFail($id);
-        $pdf = Pdf::loadView('cashier.invoice', compact('transaction'));
+        $pdf = Pdf::loadView('cashier.print', compact('transaction'));
         return $pdf->stream('invoice-' . $transaction->invoice_number . '.pdf');
     }
 
-    public function addToCart(Request $request)
+    
+
+    public function showReceipt($id)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
+        $transaction = Transaction::with(['details.product', 'paymentMethod', 'user'])
+            ->findOrFail($id);
 
-        $product = Product::find($request->product_id);
-
-        // Simpan produk ke session
-        $cart = session()->get('cart', []);
-        $cart[$product->id] = [
-            'product_id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price,
-            'quantity' => $request->quantity,
-            'subtotal' => $product->price * $request->quantity,
-        ];
-        session()->put('cart', $cart);
-
-        return response()->json(['success' => 'Produk berhasil ditambahkan ke keranjang.']);
+        return view('cashier.print', compact('transaction'));
     }
 
-    public function orders()
+    public function printReceipt($id)
     {
-        // Ambil semua transaksi beserta detail dan produk
-        $transactions = Transaction::with(['details.product', 'paymentMethod'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $transaction = Transaction::with(['details.product', 'paymentMethod', 'user'])
+            ->findOrFail($id);
 
-        return view('cashier.orders', compact('transactions'));
+        return view('cashier.print', compact('transaction'));
     }
 
 
