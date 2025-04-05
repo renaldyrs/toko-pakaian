@@ -82,6 +82,14 @@
                 <span>Pembayaran:</span>
                 <span>{{ $transaction->paymentMethod->name }}</span>
             </div>
+            <div class="flex justify-between font-bold">
+                <span>Pembayaran:</span>
+                <span>Rp {{ number_format($transaction->payment_amount) }}</span>
+            </div>
+            <div class="flex justify-between font-bold">
+                <span>Kembalian:</span>
+                <span>Rp {{ number_format($transaction->change_amount) }}</span>
+            </div>
         </div>
 
         <div class="text-center mt-4">

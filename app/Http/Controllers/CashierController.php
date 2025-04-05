@@ -69,6 +69,8 @@ class CashierController extends Controller
             $transaction->invoice_number = $invoiceNumber;
             $transaction->total_amount = 0; // Akan diupdate
             $transaction->payment_method_id = $request->payment_method_id;
+            $transaction->payment_amount = $request->payment_amount;
+            $transaction->change_amount = $request->change_amount;
             $transaction->user_id = auth()->id();
             $transaction->save();
 
