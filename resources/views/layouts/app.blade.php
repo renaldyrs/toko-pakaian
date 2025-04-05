@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 
 <head>
     <meta charset="UTF-8">
@@ -9,16 +9,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
+
 
 </head>
 
@@ -67,16 +63,7 @@
             }
         });
 
-        // Toggle dark mode
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-        }
-
-        // Initialize dark mode
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.documentElement.classList.add('dark');
-        }
+       
     </script>
     
 </body>

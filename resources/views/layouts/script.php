@@ -4,15 +4,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
+    <link rel="stylesheet" href="css/styles.css">
+    
 <script>
     // Fungsi untuk toggle dropdown navbar
     function toggleDropdown() {
@@ -44,13 +41,7 @@
             sidebarOverlay.classList.add('hidden');
         });
 
-        // Theme toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        themeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-        });
-
+       
         // User dropdown
         const userMenuButton = document.getElementById('user-menu-button');
         const userDropdown = document.getElementById('user-dropdown');
@@ -66,12 +57,7 @@
             }
         });
 
-        // Check for saved theme preference
-        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        
     </script>   
 
 

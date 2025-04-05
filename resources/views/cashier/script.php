@@ -1,215 +1,349 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const cart = []; // Menyimpan data keranjang
-        const cartTableBody = document.querySelector('#cartTable tbody');
-        const cartTotal = document.getElementById('cartTotal');
-        const paymentAmountInput = document.getElementById('paymentAmount');
-        const changeAmount = document.getElementById('changeAmount');
-        const paymentAmountHidden = document.getElementById('paymentAmountInput');
-        const changeAmountHidden = document.getElementById('changeAmountInput');
+        let cart = [];
+        const cartItemsEl = document.getElementById('cartItems');
+        const emptyCartMessage = document.getElementById('emptyCartMessage');
+        const subtotalEl = document.getElementById('subtotal');
+        const totalEl = document.getElementById('total');
+        const discountEl = document.getElementById('discount');
+        const paymentMethodEl = document.getElementById('paymentMethod');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const productSearch = document.getElementById('productSearch');
+        const productGrid = document.getElementById('productGrid');
 
-        // Fungsi untuk menambahkan produk ke keranjang
-        document.querySelectorAll('.add-to-cart').forEach(button => {
-            button.addEventListener('click', function () {
-                const productId = this.getAttribute('data-product-id');
-                const quantityInput = document.getElementById(`quantity-${productId}`);
-                const quantity = parseInt(quantityInput.value);
+        const startScannerBtn = document.getElementById('startScannerBtn');
+        const stopScannerBtn = document.getElementById('stopScannerBtn');
+        const scannerModal = document.getElementById('scannerModal');
+        const scannerElement = document.getElementById('scanner');
 
-                // Ambil stok produk dari tabel
-                const productRow = this.closest('tr');
-                const productStock = parseInt(productRow.querySelector('td:nth-child(3)').textContent);
+        // Fungsi untuk update tampilan keranjang
+        function updateCart() {
+            // Kosongkan dulu
+            cartItemsEl.innerHTML = '';
 
-                if (quantity > 0 && quantity <= productStock) {
-                    // Cek apakah produk sudah ada di keranjang
-                    const existingItem = cart.find(item => item.productId === productId);
-                    if (existingItem) {
-                        // Jika jumlah yang diminta melebihi stok, tampilkan pesan error
-                        if (existingItem.quantity + quantity > productStock) {
-                            alert(`Stok produk tidak mencukupi. Stok tersedia: ${productStock}`);
-                            return;
-                        }
-                        existingItem.quantity += quantity; // Tambah jumlah jika sudah ada
-                        existingItem.subtotal = Math.round(existingItem.price * existingItem.quantity); // Bulatkan ke integer
+            if (cart.length === 0) {
+                cartItemsEl.appendChild(emptyCartMessage);
+                subtotalEl.textContent = 'Rp 0';
+                totalEl.textContent = 'Rp 0';
+                discountEl.textContent = 'Rp 0';
+                checkoutBtn.disabled = true;
+                return;
+            }
+
+            // Hitung subtotal
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            let discount = 0;
+            let total = subtotal - discount;
+
+            // Update summary
+            subtotalEl.textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
+            discountEl.textContent = 'Rp ' + discount.toLocaleString('id-ID');
+            totalEl.textContent = 'Rp ' + total.toLocaleString('id-ID');
+
+            // Tampilkan item
+            cart.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'flex justify-between items-center py-2 border-b';
+                itemEl.innerHTML = `
+                            <div class="flex-1">
+                                <div class="font-medium">${item.name}</div>
+                                <div class="flex items-center mt-1">
+                                    <button class="quantity-btn px-2 py-1 bg-gray-200 rounded" data-index="${index}" data-action="decrease">
+                                        <i class="fas fa-minus text-xs"></i>
+                                    </button>
+                                    <span class="mx-2">${item.quantity}</span>
+                                    <button class="quantity-btn px-2 py-1 bg-gray-200 rounded" data-index="${index}" data-action="increase">
+                                        <i class="fas fa-plus text-xs"></i>
+                                    </button>
+                                    <span class="ml-4 text-blue-600">Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</span>
+                                </div>
+                            </div>
+                            <button class="remove-btn ml-2 text-red-500 hover:text-red-700" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        `;
+                cartItemsEl.appendChild(itemEl);
+            });
+
+            // Aktifkan tombol checkout jika ada item dan metode pembayaran dipilih
+            checkoutBtn.disabled = cart.length === 0 || !paymentMethodEl.value;
+        }
+
+        // Event listener untuk produk
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+                const price = parseFloat(this.dataset.price);
+                const stock = parseInt(this.dataset.stock);
+
+                // Cek apakah produk sudah ada di keranjang
+                const existingItem = cart.find(item => item.id === id);
+
+                if (existingItem) {
+                    if (existingItem.quantity < stock) {
+                        existingItem.quantity += 1;
                     } else {
-                        // Tambahkan produk baru ke keranjang
-                        const product = {
-                            productId: productId,
-                            name: productRow.querySelector('td:nth-child(1)').textContent,
-                            price: Math.round(parseFloat(productRow.querySelector('td:nth-child(2)').textContent.replace('Rp ', '').replace(/\./g, ''))), // Bulatkan ke integer
-                            quantity: quantity,
-                            subtotal: 0
-                        };
-                        product.subtotal = Math.round(product.price * product.quantity); // Bulatkan ke integer
-                        cart.push(product);
+                        alert('Stok tidak mencukupi');
                     }
-
-                    // Update tampilan keranjang
-                    updateCartView();
                 } else {
-                    alert(`Jumlah produk tidak valid atau melebihi stok. Stok tersedia: ${productStock}`);
+                    cart.push({
+                        id,
+                        name,
+                        price,
+                        quantity: 1,
+                        stock
+                    });
                 }
+
+                updateCart();
             });
         });
 
-        // Fungsi untuk mengupdate tampilan keranjang
-        function updateCartView() {
-            cartTableBody.innerHTML = ''; // Kosongkan tabel
-            let total = 0;
+        // Event delegation untuk tombol quantity dan hapus
+        cartItemsEl.addEventListener('click', function (e) {
+            if (e.target.closest('.quantity-btn')) {
+                const btn = e.target.closest('.quantity-btn');
+                const index = parseInt(btn.dataset.index);
+                const action = btn.dataset.action;
 
-            cart.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                                            <td class="px-6 py-4 text-center">${item.name}</td>
-                                            <td class="px-4 py-4 text-center">
-                                                <button type="button" class="text-blue-500 hover:text-blue-700 decrease-quantity" data-product-id="${item.productId}">
-                                                    <i class="fas fa-minus"></i>
-                                                </button>
-                                                <span class="mx-1">${item.quantity}</span>
-                                                <button type="button" class="text-blue-500 hover:text-blue-700 increase-quantity" data-product-id="${item.productId}">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
+                if (action === 'increase' && cart[index].quantity < cart[index].stock) {
+                    cart[index].quantity += 1;
+                } else if (action === 'decrease' && cart[index].quantity > 1) {
+                    cart[index].quantity -= 1;
+                }
 
-                                            </td>
-                                            <td class="px-6 py-4 text-center">Rp ${item.subtotal.toLocaleString()}</td>
-                                            <td class="px-6 py-4 text-center">
-                                                <button type="button" class="text-red-500 hover:text-red-700 remove-from-cart" data-product-id="${item.productId}">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        `;
-                cartTableBody.appendChild(row);
-                total += item.subtotal;
+                updateCart();
+            }
+
+            if (e.target.closest('.remove-btn')) {
+                const btn = e.target.closest('.remove-btn');
+                const index = parseInt(btn.dataset.index);
+                cart.splice(index, 1);
+                updateCart();
+            }
+        });
+
+        // Event listener untuk metode pembayaran
+        paymentMethodEl.addEventListener('change', function () {
+            checkoutBtn.disabled = cart.length === 0 || !this.value;
+        });
+
+        // Event listener untuk tombol checkout
+        checkoutBtn.addEventListener('click', async function () {
+            try {
+                // Tampilkan loading
+                checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+                checkoutBtn.disabled = true;
+
+                const response = await fetch('{{ route("cashier.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        items: cart,
+                        payment_method_id: paymentMethodEl.value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Terjadi kesalahan');
+                }
+
+                if (data.success) {
+                    // Tampilkan notifikasi sukses
+                    showSuccessAlert('Transaksi berhasil diproses');
+
+                    // Tampilkan invoice
+                    showInvoice(data.transaction);
+
+                    // Reset keranjang
+                    cart = [];
+                    updateCart();
+                    paymentMethodEl.value = '';
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorAlert(error.message);
+            } finally {
+                checkoutBtn.innerHTML = '<i class="fas fa-check mr-1"></i> Bayar';
+                checkoutBtn.disabled = cart.length === 0 || !paymentMethodEl.value;
+            }
+        });
+
+        // Fungsi untuk menampilkan alert error
+        function showErrorAlert(message) {
+            const alert = document.createElement('div');
+            alert.className = 'fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 z-50 rounded shadow-lg';
+            alert.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+            document.body.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Fungsi untuk menampilkan alert sukses
+        function showSuccessAlert(message) {
+            const alert = document.createElement('div');
+            alert.className = 'fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 z-50 rounded shadow-lg';
+            alert.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+            document.body.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        // Event listener untuk pencarian produk
+        productSearch.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll('.product-card').forEach(card => {
+                const name = card.dataset.name.toLowerCase();
+                const barcode = card.dataset.barcode.toLowerCase();
+
+                if (name.includes(searchTerm) || barcode.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+                
             });
+        });
 
-            // Update total (tanpa koma)
-            cartTotal.textContent = `Rp ${total.toLocaleString('id-ID', { maximumFractionDigits: 0 })}`;
-
-            // Hitung kembalian
-            calculateChange(total);
-
-            // Tambahkan event listener untuk tombol hapus
-            document.querySelectorAll('.remove-from-cart').forEach(button => {
-                button.addEventListener('click', function () {
-                    const productId = this.getAttribute('data-product-id');
-                    const index = cart.findIndex(item => item.productId === productId);
-                    if (index !== -1) {
-                        cart.splice(index, 1); // Hapus item dari keranjang
-                        updateCartView(); // Update tampilan
+        // Event listener untuk filter kategori
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const category = this.dataset.category;
+                document.querySelectorAll('.product-card').forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
                     }
                 });
-            });
-            function processPayment() {
-                const payment = parseFloat(document.getElementById('payment').value) || 0;
-                const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-                if (payment < total) {
-                    alert('Jumlah pembayaran kurang!');
+                // Update active button
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('bg-blue-600', 'text-white'));
+                this.classList.add('bg-blue-600', 'text-white');
+            });
+        });
+
+        // Fungsi untuk menampilkan invoice
+        function showInvoice(transaction) {
+            // Implementasi tampilan invoice
+            console.log('Invoice for transaction:', transaction);
+            // Dalam implementasi nyata, ini akan membuka modal atau window baru
+            // untuk menampilkan invoice dan mencetaknya
+            window.open(`/cashier/invoice/${transaction.id}`, '_blank');
+        }
+
+        // Fungsi untuk memulai scanner
+        function startScanner() {
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: scannerElement, // Elemen untuk menampilkan kamera
+                    constraints: {
+                        facingMode: "environment" // Gunakan kamera belakang
+                    }
+                },
+                decoder: {
+                    readers: ["code_128_reader", "ean_reader", "upc_reader"] // Format barcode yang didukung
+                }
+            }, function (err) {
+                if (err) {
+                    console.error("QuaggaJS error:", err);
                     return;
                 }
-
-                alert('Pembayaran berhasil!');
-                printReceipt(); // Cetak struk setelah pembayaran berhasil
-                cart = []; // Kosongkan keranjang
-                updateCartView();
-                document.getElementById('payment').value = '';
-                document.getElementById('change').value = '';
-            }
-            // Tambahkan event listener untuk tombol tambah jumlah
-            document.querySelectorAll('.increase-quantity').forEach(button => {
-                button.addEventListener('click', function () {
-                    const productId = this.getAttribute('data-product-id');
-                    const item = cart.find(item => item.productId === productId);
-                    if (item) {
-                        item.quantity += 1;
-                        item.subtotal = item.price * item.quantity;
-                        updateCartView();
-                    }
-                });
+                Quagga.start();
             });
 
-            // Tambahkan event listener untuk tombol kurangi jumlah
-            document.querySelectorAll('.decrease-quantity').forEach(button => {
-                button.addEventListener('click', function () {
-                    const productId = this.getAttribute('data-product-id');
-                    const item = cart.find(item => item.productId === productId);
-                    if (item && item.quantity > 1) {
-                        item.quantity -= 1;
-                        item.subtotal = item.price * item.quantity;
-                        updateCartView();
+            // Event ketika barcode terdeteksi
+            Quagga.onDetected(function (data) {
+                const barcode = data.codeResult.code;
+                console.log("Barcode detected:", barcode);
+
+
+                // Cari produk berdasarkan barcode
+                const productCard = Array.from(document.querySelectorAll('.product-card')).find(card => card.dataset.barcode === barcode);
+
+                if (productCard) {
+                    const id = productCard.dataset.id;
+                    const name = productCard.dataset.name;
+                    const price = parseFloat(productCard.dataset.price);
+                    const stock = parseInt(productCard.dataset.stock);
+
+                    // Tambahkan produk ke keranjang
+                    const existingItem = cart.find(item => item.id === id);
+
+                    if (existingItem) {
+                        if (existingItem.quantity < stock) {
+                            existingItem.quantity += 1;
+                        } else {
+                            alert('Stok tidak mencukupi');
+                        }
+                    } else {
+                        cart.push({
+                            id,
+                            name,
+                            price,
+                            quantity: 1,
+                            stock
+                        });
                     }
-                });
+
+                    updateCart();
+                    alert(`Produk "${name}" berhasil ditambahkan ke keranjang.`);
+                } else {
+                    alert('Produk dengan barcode ini tidak ditemukan');
+                }
+
+                // Hentikan scanner setelah barcode ditemukan
+                stopScanner();
             });
         }
 
-        // Fungsi untuk menghitung kembalian
-        function calculateChange(total) {
-            const paymentAmount = Math.round(parseFloat(paymentAmountInput.value) || 0); // Bulatkan ke integer
-            const change = paymentAmount - total;
-
-            if (change >= 0) {
-                changeAmount.textContent = `Rp ${change.toLocaleString('id-ID', { maximumFractionDigits: 0 })}`;
-            } else {
-                changeAmount.textContent = 'Uang bayar kurang';
-            }
-
-            // Simpan nilai uang bayar dan kembalian di input hidden
-            paymentAmountHidden.value = paymentAmount;
-            changeAmountHidden.value = change >= 0 ? change : 0;
+        // Fungsi untuk menghentikan scanner
+        function stopScanner() {
+            Quagga.stop();
+            scannerModal.classList.add('hidden');
         }
 
-        // Event listener untuk input uang bayar
-        paymentAmountInput.addEventListener('input', function () {
-            const total = Math.round(parseFloat(cartTotal.textContent.replace('Rp ', '').replace(/\./g, '')) || 0); // Bulatkan ke integer
-            calculateChange(total);
+        // Event listener untuk tombol mulai scanner
+        startScannerBtn.addEventListener('click', function () {
+            scannerModal.classList.remove('hidden');
+            startScanner();
         });
 
-        // Submit form
-        document.getElementById('cashierForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            // Pastikan keranjang tidak kosong
-            if (cart.length === 0) {
-                alert('Keranjang belanja kosong. Silakan tambahkan produk terlebih dahulu.');
-                return;
-            }
-
-            // Pastikan uang bayar cukup
-            const total = Math.round(parseFloat(cartTotal.textContent.replace('Rp ', '').replace(/\./g, '')) || 0); // Bulatkan ke integer
-            const paymentAmount = Math.round(parseFloat(paymentAmountInput.value) || 0); // Bulatkan ke integer
-            if (paymentAmount < total) {
-                alert('Uang bayar tidak mencukupi.');
-                return;
-            }
-
-            // Konversi data keranjang ke format yang bisa dikirim ke backend
-            const items = cart.map(item => ({
-                product_id: item.productId,
-                quantity: item.quantity,
-                price: Math.round(item.price), // Bulatkan ke integer
-                subtotal: Math.round(item.subtotal), // Bulatkan ke integer
-            }));
-
-
-
-            // Tambahkan input hidden untuk mengirim data keranjang
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'items';
-            input.value = JSON.stringify(items);
-            this.appendChild(input);
-
-            // Submit form
-            this.submit();
-            alert(
-                `Pembayaran berhasil!\n\n` +
-                `Total Belanja: Rp ${total.toLocaleString()}\n` +
-                `Jumlah Pembayaran: Rp ${payment.toLocaleString()}\n` +
-                `Kembalian: Rp ${change.toLocaleString()}\n\n` +
-                `Terima kasih telah berbelanja!`
-            );
+        // Event listener untuk tombol berhenti scanner
+        stopScannerBtn.addEventListener('click', function () {
+            stopScanner();
         });
-
 
     });
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    
+    
