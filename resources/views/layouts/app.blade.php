@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 
@@ -30,7 +30,10 @@
         <div class="flex-1 flex flex-col overflow-hidden">
             @include('partials.navbar')
             <main class="flex-1 overflow-y-auto p-4">@yield('content')</main>
+            @include('partials.footer')
         </div>
+
+
     </div>
 
 
@@ -63,9 +66,9 @@
             }
         });
 
-       
+
     </script>
-    
+
 </body>
 
 </html>

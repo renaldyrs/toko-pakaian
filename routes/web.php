@@ -59,12 +59,14 @@ Route::prefix('cashier')->group(function () {
 Route::prefix('reports')->group(function () {
     Route::get('/', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/financial', [ReportController::class, 'financialReport'])->name('reports.financial');
+    Route::get('/laporan-pesanan', [ReportController::class, 'laporanPesanan'])->name('reports.laporan-pesanan');
 });
 
 // Financial Reports
 Route::prefix('financial-reports')->group(function () {
     Route::get('/', [FinancialReportController::class, 'index'])->name('financial-reports.index');
     Route::get('/export', [FinancialReportController::class, 'exportPdf'])->name('financial-reports.export');
+    Route::get('/laporan-keuangan', [FinancialReportController::class, 'laporanKeuangan'])->name('financial-reports.laporan-keuangan');
 });
 
 // Store Profile

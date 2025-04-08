@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8 ">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="container mx-auto px-4 py-6">
+        <div class="overflow-hidden">
             <!-- Header -->
-            <div class="bg-blue-600 px-6 py-4">
-                <h1 class="text-2xl font-bold text-white">Manajemen User</h1>
+            <div class="px-6 py-4">
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Manajemen User</h1>
             </div>
 
             <!-- Form dan Tabel dalam Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 dark:bg-gray-800">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 dark:bg-gray-900">
                 <!-- Form Kategori (Kolom Kiri) -->
 
-                <div class="lg:col-span-1 bg-gray-50 p-6 rounded-lg border shadow dark:bg-gray-700 dark:border-gray-600">
+                <div class="lg:col-span-1 bg-gray-50 p-6 rounded-lg border shadow dark:bg-gray-800 dark:border-gray-800">
                     <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
                         <i class="fas fa-plus-circle mr-2 text-blue-500"></i>
                         Tambah User Baru
@@ -84,8 +84,8 @@
                 <div class="col-span-2">
                     <div class="lg:col-span-2 shadow rounded-lg">
                         <div class="bg-white rounded-lg border overflow-hidden">
-                            <div class="px-6 py-4 border-b flex justify-between items-center dark:bg-gray-700">
-                                <h2 class="text-xl font-semibold text-gray-800">
+                            <div class="px-6 py-4 border-b flex justify-between items-center dark:bg-gray-800">
+                                <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
                                     <i class="fas fa-list-alt mr-2 text-blue-500"></i>
                                     Daftar Kategori
                                 </h2>

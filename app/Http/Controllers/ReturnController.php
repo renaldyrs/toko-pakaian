@@ -18,7 +18,8 @@ class ReturnController extends Controller
 {
    // ReturnController.php
    public function index() {
-    $returns = Returns::with(['transaction', 'product', 'user'])->get();
+    $returns = Returns::with(['transaction', 'product', 'user'])
+    ->paginate(10);
     return view('return.index', compact('returns'));
 }
 
@@ -28,10 +29,10 @@ public function create($transaction_id) {
 }
 
 public function store(Request $request) {
-
+    \Log::info($request->all());
     
 
-    $request->validate([
+   $validated = $request->validate([
         'transaction_id' => 'required|exists:transactions,id',
         'product_id' => 'required|exists:products,id',
         'quantity' => 'required|integer|min:1',
@@ -50,15 +51,16 @@ public function store(Request $request) {
 
     $number = 'RET-' . date('Ymd') . '-' . strtoupper(Str::random(4));
 
-    $return = Returns::create([
+    Returns::create([
         'return_number' => $number,
-        'transaction_id' => $request->transaction_id,
-        'product_id' => $request->product_id,
-        'quantity' => $request->quantity,
-        'total_refund' => $transactionDetail->price * $request->quantity,
-        'reason' => $request->reason,
+        'transaction_id' => $validated['transaction_id'],
+        'product_id' => $validated['product_id'],
+        'quantity' => $validated['quantity'],
+        'total_refund' => $transactionDetail->price * $validated['quantity'],
+        'reason' => $validated['reason'],
         'user_id' => auth()->id(),
     ]);
+    
 
     return redirect()->route('returns.index')->with('success', 'Permintaan retur berhasil diajukan');
 }

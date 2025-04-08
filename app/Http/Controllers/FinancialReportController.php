@@ -118,4 +118,5 @@ class FinancialReportController extends Controller
 
         return $pdf->download('laporan_keuangan.pdf');
     }
+    
 }

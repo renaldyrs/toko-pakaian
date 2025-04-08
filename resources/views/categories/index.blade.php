@@ -124,7 +124,7 @@
                             </table>
                             <hr>
                             <div class="p-4 shadow">
-                                {{ $categories->links() }}
+                                {{ $categories->links('vendor.tailwind') }}
                             </div>
                         </div>
                     </div>

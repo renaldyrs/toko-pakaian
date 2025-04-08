@@ -25,7 +25,8 @@ class CashierController extends Controller
     // Menampilkan halaman kasir
     public function index()
     {
-        $products = Product::where('stock', '>', 0)->get();
+        $products = Product::where('stock', '>', 0)
+        ->paginate(10);
         $storeProfile = StoreProfile::first();
         $paymentMethods = PaymentMethod::all();
         $categories = Category::all();
@@ -95,6 +96,8 @@ class CashierController extends Controller
             $transaction->total_amount = $total;
             $transaction->save();
 
+            
+
             DB::commit();
 
             return response()->json([
@@ -134,7 +137,7 @@ class CashierController extends Controller
         $products = Product::where('stock', '>', 0)->get();
         $paymentMethods = PaymentMethod::all();
         $transaction = Transaction::with(['details.product', 'paymentMethod'])->findOrFail($id);
-        return view('cashier.print', compact('transaction', 'storeProfile', 'paymentMethods', 'products'));
+        return view('cashier.invoice', compact('transaction', 'storeProfile', 'paymentMethods', 'products'));
     }
 
     // Generate PDF invoice

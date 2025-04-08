@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Category;
+use App\Models\Size;
 use Illuminate\Http\Request;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +19,8 @@ class ProductController extends Controller
         $products = Product::with(['category'])->paginate(5);
         $categories = Category::all();
         $suppliers = Supplier::all();
-        return view('products.index', compact('products', 'categories', 'suppliers'));
+        $sizes = Size::all();
+        return view('products.index', compact('products', 'categories', 'suppliers', 'sizes'));
     }
 
     // Menampilkan form tambah produk
@@ -26,7 +28,8 @@ class ProductController extends Controller
     {
         $suppliers = Supplier::all();
         $categories = Category::all();
-        return view('products.create', compact('suppliers', 'categories'));
+        $sizes = Size::all();
+        return view('products.create', compact('suppliers', 'categories', 'sizes'));
     }
 
     // Menyimpan produk baru
@@ -39,6 +42,9 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'sizes' => 'required|array',
+            'sizes.*.name' => 'required|string|max:255',
+            'sizes.*.stock' => 'required|integer|min:0',
         ]);
 
         // Generate kode produk
@@ -61,6 +67,14 @@ class ProductController extends Controller
             'image' => $imagePath,
         ]);
 
+        // Simpan ukuran dan stok
+        if ($request->has('sizes')) {
+            foreach ($request->sizes as $size) {
+                $sizeModel = Size::firstOrCreate(['name' => $size['name']]);
+                $product->sizes()->attach($sizeModel->id, ['stock' => $size['stock']]);
+            }
+        }
+
         // Generate barcode
         $product->generateBarcode();
 
@@ -71,7 +85,8 @@ class ProductController extends Controller
     {
         $suppliers = Supplier::all();
         $categories = Category::all();
-        return view('products.edit', compact('product', 'suppliers', 'categories'));
+        $sizes = Size::all();
+        return view('products.edit', compact('product', 'suppliers', 'categories', 'sizes'));
     }
 
     public function update(Request $request, Product $product)
@@ -84,6 +99,9 @@ class ProductController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'supplier_id' => 'nullable|exists:suppliers,id',
             'category_id' => 'required|exists:categories,id',
+            'sizes' => 'nullable|array',
+            'sizes.*.name' => 'required|string|max:255',
+            'sizes.*.stock' => 'required|integer|min:0',
         ]);
 
         $data = $request->all();
@@ -96,6 +114,18 @@ class ProductController extends Controller
 
         // Simpan data produk
         $product->update($data);
+
+        // Perbarui ukuran dan stok
+        if ($request->has('sizes')) {
+            // Hapus semua ukuran yang terkait dengan produk
+            $product->sizes()->detach();
+
+            // Tambahkan ukuran baru atau perbarui stok
+            foreach ($request->sizes as $size) {
+                $sizeModel = Size::firstOrCreate(['name' => $size['name']]);
+                $product->sizes()->attach($sizeModel->id, ['stock' => $size['stock']]);
+            }
+        }
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui.');
     }
@@ -114,12 +144,12 @@ class ProductController extends Controller
         return response($barcode)->header('Content-Type', 'image/png');
     }
     public function findByCode(Request $request)
-{
-    $code = $request->query('code'); // Ambil kode dari query parameter
-    $product = Product::where('code', $code)->first(); // Cari produk berdasarkan kode
+    {
+        $code = $request->query('code'); // Ambil kode dari query parameter
+        $product = Product::where('code', $code)->first(); // Cari produk berdasarkan kode
 
-    return response()->json($product); // Kembalikan data produk dalam format JSON
-}
+        return response()->json($product); // Kembalikan data produk dalam format JSON
+    }
 
     public function downloadBarcode($id)
     {
@@ -141,11 +171,11 @@ class ProductController extends Controller
     public function printBarcodes($id)
     {
         $products = Product::where('id', $id)
-        ->where('stock', '>', 0)
+            ->where('stock', '>', 0)
             ->orderBy('name')
             ->get();
         return view('products.barcode', compact('products'));
     }
 
-    
+
 }

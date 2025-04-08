@@ -4,20 +4,17 @@
     <title>Cetak Barcode Produk</title>
     <style>
         @page {
-            size: 33mm 25mm; /* Ukuran kertas thermal */
-            margin: 2mm;
+            size: 80mm 50mm; /* Ukuran kertas thermal */
+            margin: 2mm; /* Margin kertas */
         }
         body {
             font-family: Arial, sans-serif;
             font-size: 10px;
-            
         }
         .barcode-sheet {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 kolom */
-            width: 33mm;
-            gap: 2mm;
-            width: 100%;
+            grid-template-columns: 1fr; /* 1 kolom untuk thermal */
+            gap: 1mm; /* Jarak antar barcode */
         }
         .barcode-label {
             border: 1px dashed #ccc;
@@ -27,12 +24,12 @@
         }
         .product-name {
             font-weight: bold;
-            margin-bottom: 1mm;
-            word-break: break-word;
+           
+            
         }
         .barcode {
-            margin: 1mm 0;
-            height: 15mm;
+          
+            height: 30mm; /* Tinggi barcode */
         }
         .product-price {
             font-weight: bold;
@@ -43,12 +40,12 @@
         }
         @media screen {
             body {
-                padding: 10px;
+                
                 background: #f5f5f5;
             }
             .no-print {
                 display: block;
-                margin-bottom: 10px;
+                
             }
         }
     </style>
@@ -72,7 +69,7 @@
                     <div class="product-name">{{ Str::limit($product->name, 20) }}</div>
                     <svg class="barcode"
                         jsbarcode-value="{{ $product->code }}"
-                        jsbarcode-height="30"
+                        jsbarcode-height="30" /* Tinggi barcode */
                         jsbarcode-displayValue="false"
                         jsbarcode-margin="0">
                     </svg>

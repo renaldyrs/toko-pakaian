@@ -12,6 +12,8 @@ class Returns extends Model
     protected $fillable = [
         'return_number',
         'transaction_id',
+        'product_id',
+        'quantity',
         'user_id',
         'reason',
         'total_refund',
