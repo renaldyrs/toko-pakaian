@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 @section('content')
@@ -5,11 +6,9 @@
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800">Laporan Pesanan</h1>
-            
-                <button onclick="window.print()" class="h-10 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-                    <i class="fas fa-print mr-2"></i>Cetak
-                </button>
-            
+            <button onclick="window.print()" class="h-10 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                <i class="fas fa-print mr-2"></i>Cetak
+            </button>
         </div>
 
         <!-- Statistik -->
@@ -43,7 +42,7 @@
                         <input type="date" name="end_date" value="{{ $endDate }}"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow">
                     </div>
-                    <button type="submit" class="mt-6  p-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <button type="submit" class="mt-6 p-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                         <i class="fas fa-filter mr-2"></i>
                     </button>
                 </form>
@@ -60,14 +59,14 @@
                                 Invoice</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Tanggal</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total
-                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Items</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Total</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Pembayaran</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi
-                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -83,7 +82,11 @@
                                     <div class="flex flex-wrap gap-1">
                                         @foreach ($transaction->details as $detail)
                                             <span class="px-2 py-1 bg-gray-100 text-xs rounded-full">
-                                                {{ $detail->product->name }} ({{ $detail->quantity }})
+                                                {{ $detail->product->name }}
+                                                ({{ $detail->quantity }})
+                                                @if ($detail->size)
+                                                    <span class="text-gray-500">[{{ $detail->size }}]</span>
+                                                @endif
                                             </span>
                                         @endforeach
                                     </div>
@@ -129,6 +132,7 @@
         @endif
     </div>
 @endsection
+
 <!-- Print Styles -->
 <style>
     @media print {

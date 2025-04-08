@@ -6,66 +6,60 @@
             <!-- Grid Layout -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 dark:bg-gray-900">
                 <!-- Daftar Produk (Kolom Kiri) -->
-                <div class="lg:col-span-2 bg-gray-50 p-6 rounded-lg border shadow dark:bg-gray-800 dark:border-gray-800">
-                    <div>
-
-                 <h2 class="text-xl font-bold mb-4 text-gray-800">Daftar Produk</h2>
-                    <!-- Search Bar -->
-                    <div class="mb-4 relative">
-                        <input type="text" id="productSearch" placeholder="Cari produk..."
-                            class="w-full p-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                    </div>
-
-                    <!-- Kategori -->
-                    <div class="mb-4 flex flex-wrap gap-2">
-                        <button
-                            class="category-btn px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm hover:bg-blue-200 active:bg-blue-300"
-                            data-category="all">Semua</button>
-                        @foreach($categories as $category)
-                            <button
-                                class="category-btn px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm hover:bg-gray-200 active:bg-gray-300"
-                                data-category="{{ $category->id }}">{{ $category->name }}</button>
-                        @endforeach
-                    </div>
-
-                    <!-- Daftar Produk -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="productGrid">
-                        @foreach($products as $product)
-                            <div class="product-card p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-                                data-id="{{ $product->id }}" data-name="{{ $product->name }}" data-price="{{ $product->price }}"
-                                data-stock="{{ $product->stock }}" data-category="{{ $product->category_id }}"
-                                data-barcode="{{ $product->barcode }}">
-                                <div class="h-32 bg-gray-100 rounded-md mb-2 overflow-hidden">
-                                    @if($product->image)
-                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                            class="w-full h-full object-cover">
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center text-gray-400">
-                                            <i class="fas fa-image fa-2x"></i>
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="flex justify-between items-center mt-1">
-                                    <span class="font-medium text-gray-800 truncate">{{ $product->name }}</span>
-                                    <span>{{ $product->barcode }}</span>
-                                </div>
-                                <div class="flex justify-between items-center mt-1">
-                                    <span class="text-blue-600 font-bold">Rp {{ number_format($product->price) }}</span>
-                                    <span class="text-xs text-gray-500">Stok: {{ $product->stock }}</span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                    
-                
-                </div>
-                <hr class="my-4">
-                <div class="">
-                
-                {{ $products->appends(request()->query())->links() }}
-                </div>
+                <!-- Daftar Produk (Kolom Kiri) -->
+    <div class="lg:col-span-2 p-6  dark:bg-gray-800 dark:border-gray-800">
+        <div>
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Daftar Produk</h2>
+            <!-- Search Bar -->
+            <div class="mb-4 relative">
+                <input type="text" id="productSearch" placeholder="Cari produk..."
+                    class="w-full p-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
             </div>
+
+            <!-- Kategori -->
+            <div class="mb-4 flex flex-wrap gap-2">
+                <button
+                    class="category-btn px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm hover:bg-blue-200 active:bg-blue-300"
+                    data-category="all">Semua</button>
+                @foreach($categories as $category)
+                    <button
+                        class="category-btn px-3 py-1 bg-blue-100 text-gray-800 rounded-full text-sm hover:bg-blue-200 active:bg-blue-300"
+                        data-category="{{ $category->id }}">{{ $category->name }}</button>
+                @endforeach
+            </div>
+
+            <!-- Daftar Produk dengan Scroll -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 overflow-y-auto max-h-96" id="productGrid">
+                @foreach($products as $product)
+                    <div class="product-card p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                        data-id="{{ $product->id }}" data-name="{{ $product->name }}"
+                        data-price="{{ $product->price }}" data-stock="{{ $product->stock }}"
+                        data-category="{{ $product->category_id }}" data-barcode="{{ $product->barcode }}"
+                        data-sizes="{{ $product->sizes->map(fn($size) => ['name' => $size->name, 'stock' => $size->pivot->stock])->toJson() }}">
+                        <div class="h-32 bg-gray-100 rounded-md mb-2 overflow-hidden">
+                            @if($product->image)
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                                    class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                    <i class="fas fa-image fa-2x"></i>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="font-medium text-gray-800 truncate">{{ $product->name }}</span>
+                            <span>{{ $product->barcode }}</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-blue-600 font-bold">Rp {{ number_format($product->price) }}</span>
+                            <span class="text-xs text-gray-500">Stok: {{ $product->stock }}</span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
 
                 <!-- Keranjang Belanja (Kolom Kanan) -->
                 <div class="col-span-1  dark:bg-gray-800 dark:border-gray-800">
@@ -199,7 +193,6 @@
 
             // Fungsi untuk update tampilan keranjang
             function updateCart() {
-                // Kosongkan dulu
                 cartItemsEl.innerHTML = '';
 
                 if (cart.length === 0) {
@@ -211,42 +204,38 @@
                     return;
                 }
 
-                // Hitung subtotal
                 let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 let discount = 0;
                 let total = subtotal - discount;
 
-                // Update summary
                 subtotalEl.textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
                 discountEl.textContent = 'Rp ' + discount.toLocaleString('id-ID');
                 totalEl.textContent = 'Rp ' + total.toLocaleString('id-ID');
 
-                // Tampilkan item
                 cart.forEach((item, index) => {
                     const itemEl = document.createElement('div');
                     itemEl.className = 'flex justify-between items-center py-2 border-b';
                     itemEl.innerHTML = `
-                                                                                <div class="flex-1">
-                                                                                    <div class="font-medium">${item.name}</div>
-                                                                                    <div class="flex items-center mt-1">
-                                                                                        <button class="quantity-btn px-2 py-1 bg-gray-200 rounded" data-index="${index}" data-action="decrease">
-                                                                                            <i class="fas fa-minus text-xs"></i>
-                                                                                        </button>
-                                                                                        <span class="mx-2">${item.quantity}</span>
-                                                                                        <button class="quantity-btn px-2 py-1 bg-gray-200 rounded" data-index="${index}" data-action="increase">
-                                                                                            <i class="fas fa-plus text-xs"></i>
-                                                                                        </button>
-                                                                                        <span class="ml-4 text-blue-600">Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <button class="remove-btn ml-2 text-red-500 hover:text-red-700" data-index="${index}">
-                                                                                    <i class="fas fa-trash"></i>
-                                                                                </button>
-                                                                            `;
+                    <div class="flex-1">
+                        <div class="font-medium">${item.name} ${item.size ? `(${item.size})` : ''}</div>
+                        <div class="flex items-center mt-1">
+                            <button class="quantity-btn px-2 py-1 bg-gray-200 rounded" data-index="${index}" data-action="decrease">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <span class="mx-2">${item.quantity}</span>
+                            <button class="quantity-btn px-2 py-1 bg-gray-200 rounded" data-index="${index}" data-action="increase">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                            <span class="ml-4 text-blue-600">Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+                    <button class="remove-btn ml-2 text-red-500 hover:text-red-700" data-index="${index}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
                     cartItemsEl.appendChild(itemEl);
                 });
 
-                // Aktifkan tombol checkout jika ada item dan metode pembayaran dipilih
                 checkoutBtn.disabled = cart.length === 0 || !paymentMethodEl.value;
             }
 
@@ -256,25 +245,66 @@
                     const id = this.dataset.id;
                     const name = this.dataset.name;
                     const price = parseFloat(this.dataset.price);
-                    const stock = parseInt(this.dataset.stock);
+                    const stock = parseInt(this.dataset.stock); // Stok produk tanpa ukuran
+                    const sizes = JSON.parse(this.dataset.sizes); // Data ukuran produk
 
-                    // Cek apakah produk sudah ada di keranjang
-                    const existingItem = cart.find(item => item.id === id);
+                    // Jika produk memiliki ukuran
+                    if (sizes.length > 0) {
+                        let sizeOptions = sizes.map(size => `${size.name} (Stok: ${size.stock})`).join('\n');
+                        let selectedSize = prompt(`Pilih ukuran untuk produk "${name}":\n${sizeOptions}`);
 
-                    if (existingItem) {
-                        if (existingItem.quantity < stock) {
-                            existingItem.quantity += 1;
+                        // Cari ukuran yang dipilih
+                        const size = sizes.find(s => s.name.toLowerCase() === selectedSize?.toLowerCase());
+
+                        if (!size) {
+                            alert('Ukuran tidak valid atau stok tidak mencukupi.');
+                            return;
+                        }
+
+                        // Periksa stok ukuran
+                        if (size.stock <= 0) {
+                            alert('Stok untuk ukuran ini tidak mencukupi.');
+                            return;
+                        }
+
+                        // Tambahkan produk dengan ukuran ke keranjang
+                        const existingItem = cart.find(item => item.id === id && item.size === size.name);
+
+                        if (existingItem) {
+                            if (existingItem.quantity < size.stock) {
+                                existingItem.quantity += 1;
+                            } else {
+                                alert('Stok tidak mencukupi.');
+                            }
                         } else {
-                            alert('Stok tidak mencukupi');
+                            cart.push({
+                                id,
+                                name,
+                                price,
+                                size: size.name,
+                                quantity: 1,
+                                stock: size.stock
+                            });
                         }
                     } else {
-                        cart.push({
-                            id,
-                            name,
-                            price,
-                            quantity: 1,
-                            stock
-                        });
+                        // Jika produk tidak memiliki ukuran
+                        const existingItem = cart.find(item => item.id === id);
+
+                        if (existingItem) {
+                            if (existingItem.quantity < stock) {
+                                existingItem.quantity += 1;
+                            } else {
+                                alert('Stok tidak mencukupi.');
+                            }
+                        } else {
+                            cart.push({
+                                id,
+                                name,
+                                price,
+                                quantity: 1,
+                                stock
+                            });
+                        }
                     }
 
                     updateCart();
@@ -358,7 +388,7 @@
                         showPaymentSuccessAlert(data.message, data.transaction);
 
 
-                        
+
 
                         // Reset keranjang
                         cart = [];
@@ -381,11 +411,11 @@
                 const alert = document.createElement('div');
                 alert.className = 'fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 z-50 rounded shadow-lg';
                 alert.innerHTML = `
-                                                                <div class="flex items-center">
-                                                                    <i class="fas fa-exclamation-circle mr-2"></i>
-                                                                    <span>${message}</span>
-                                                                </div>
-                                                            `;
+                                                                        <div class="flex items-center">
+                                                                            <i class="fas fa-exclamation-circle mr-2"></i>
+                                                                            <span>${message}</span>
+                                                                        </div>
+                                                                    `;
                 document.body.appendChild(alert);
 
                 setTimeout(() => {
@@ -395,19 +425,19 @@
 
             // Fungsi untuk menampilkan alert sukses pembayaran
             function showPaymentSuccessAlert(message, transaction) {
-    Swal.fire({
-        icon: 'success',
-        title: 'Pembayaran Berhasil',
-        text: message,
-        timer: 2000,
-        timerProgressBar: true,
-        showConfirmButton: false
-    }).then(() => {
-        // Cetak struk setelah alert selesai
-        printReceipt(transaction);
-    });
-}
-            
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pembayaran Berhasil',
+                    text: message,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                }).then(() => {
+                    // Cetak struk setelah alert selesai
+                    printReceipt(transaction);
+                });
+            }
+
 
             // Event listener untuk pencarian produk
             productSearch.addEventListener('input', function () {
@@ -453,79 +483,119 @@
             }
 
             function printReceipt(transaction) {
-    // Buka halaman cetak struk
-    const printWindow = window.open(`/cashier/print/${transaction.id}`, '_blank');
-    printWindow.focus();
-    printWindow.print();
-}
+                // Buka halaman cetak struk
+                const printWindow = window.open(`/cashier/print/${transaction.id}`, '_blank');
+                printWindow.focus();
+                printWindow.print();
+            }
 
             // Fungsi untuk memulai scanner
-            function startScanner() {
-                Quagga.init({
-                    inputStream: {
-                        name: "Live",
-                        type: "LiveStream",
-                        target: scannerElement, // Elemen untuk menampilkan kamera
-                        constraints: {
-                            facingMode: "environment" // Gunakan kamera belakang
-                        }
-                    },
-                    decoder: {
-                        readers: ["code_128_reader", "ean_reader", "upc_reader"] // Format barcode yang didukung
-                    }
-                }, function (err) {
-                    if (err) {
-                        console.error("QuaggaJS error:", err);
-                        return;
-                    }
-                    Quagga.start();
-                });
-
-                // Event ketika barcode terdeteksi
-                Quagga.onDetected(function (data) {
-                    const barcode = data.codeResult.code;
-                    console.log("Barcode detected:", barcode);
-
-
-                    // Cari produk berdasarkan barcode
-                    const productCard = Array.from(document.querySelectorAll('.product-card')).find(card => card.dataset.barcode === barcode);
-
-                    
-                    if (productCard) {
-                        const id = productCard.dataset.id;
-                        const name = productCard.dataset.name;
-                        const price = parseFloat(productCard.dataset.price);
-                        const stock = parseInt(productCard.dataset.stock);
-
-                        // Tambahkan produk ke keranjang
-                        const existingItem = cart.find(item => item.id === id);
-
-                        if (existingItem) {
-                            if (existingItem.quantity < stock) {
-                                existingItem.quantity += 1;
-                            } else {
-                                alert('Stok tidak mencukupi');
-                            }
-                        } else {
-                            cart.push({
-                                id,
-                                name,
-                                price,
-                                quantity: 1,
-                                stock
-                            });
-                        }
-
-                        updateCart();
-                        alert(`Produk "${name}" berhasil ditambahkan ke keranjang.`);
-                    } else {
-                        alert('Produk dengan barcode ini tidak ditemukan');
-                    }
-
-                    // Hentikan scanner setelah barcode ditemukan
-                    stopScanner();
-                });
+            // Fungsi untuk memulai scanner
+function startScanner() {
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: scannerElement, // Elemen untuk menampilkan kamera
+            constraints: {
+                facingMode: "environment" // Gunakan kamera belakang
             }
+        },
+        decoder: {
+            readers: ["code_128_reader", "ean_reader", "upc_reader"] // Format barcode yang didukung
+        }
+    }, function (err) {
+        if (err) {
+            console.error("QuaggaJS error:", err);
+            return;
+        }
+        Quagga.start();
+    });
+
+    // Event ketika barcode terdeteksi
+    Quagga.onDetected(function (data) {
+        const barcode = data.codeResult.code;
+        console.log("Barcode detected:", barcode);
+
+        // Cari produk berdasarkan barcode
+        const productCard = Array.from(document.querySelectorAll('.product-card')).find(card => card.dataset.barcode === barcode);
+
+        if (productCard) {
+            const id = productCard.dataset.id;
+            const name = productCard.dataset.name;
+            const price = parseFloat(productCard.dataset.price);
+            const stock = parseInt(productCard.dataset.stock);
+            const sizes = JSON.parse(productCard.dataset.sizes); // Data ukuran produk
+
+            // Jika produk memiliki ukuran
+            if (sizes.length > 0) {
+                let sizeOptions = sizes.map(size => `${size.name} (Stok: ${size.stock})`).join('\n');
+                let selectedSize = prompt(`Pilih ukuran untuk produk "${name}":\n${sizeOptions}`);
+
+                // Cari ukuran yang dipilih
+                const size = sizes.find(s => s.name.toLowerCase() === selectedSize?.toLowerCase());
+
+                if (!size) {
+                    alert('Ukuran tidak valid atau stok tidak mencukupi.');
+                    return;
+                }
+
+                // Periksa stok ukuran
+                if (size.stock <= 0) {
+                    alert('Stok untuk ukuran ini tidak mencukupi.');
+                    return;
+                }
+
+                // Tambahkan produk dengan ukuran ke keranjang
+                const existingItem = cart.find(item => item.id === id && item.size === size.name);
+
+                if (existingItem) {
+                    if (existingItem.quantity < size.stock) {
+                        existingItem.quantity += 1;
+                    } else {
+                        alert('Stok tidak mencukupi.');
+                    }
+                } else {
+                    cart.push({
+                        id,
+                        name,
+                        price,
+                        size: size.name,
+                        quantity: 1,
+                        stock: size.stock
+                    });
+                }
+            } else {
+                // Jika produk tidak memiliki ukuran
+                const existingItem = cart.find(item => item.id === id);
+
+                if (existingItem) {
+                    if (existingItem.quantity < stock) {
+                        existingItem.quantity += 1;
+                    } else {
+                        alert('Stok tidak mencukupi.');
+                    }
+                } else {
+                    cart.push({
+                        id,
+                        name,
+                        price,
+                        quantity: 1,
+                        stock
+                    });
+                }
+            }
+
+            updateCart();
+            alert(`Produk "${name}" berhasil ditambahkan ke keranjang.`);
+        } else {
+            alert('Produk dengan barcode ini tidak ditemukan');
+        }
+
+        // Hentikan scanner setelah barcode ditemukan
+        stopScanner();
+    });
+}
 
             // Fungsi untuk menghentikan scanner
             function stopScanner() {

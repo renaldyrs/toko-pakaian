@@ -25,15 +25,16 @@ class CashierController extends Controller
     // Menampilkan halaman kasir
     public function index()
     {
-        $products = Product::where('stock', '>', 0)
-        ->paginate(10);
+        $products = Product::with('sizes')->where('stock', '>', 0)->get();
         $storeProfile = StoreProfile::first();
         $paymentMethods = PaymentMethod::all();
         $categories = Category::all();
+
         return view('cashier.index', compact('products', 'paymentMethods', 'storeProfile', 'categories'));
     }
 
     // Menyimpan transaksi
+
     public function store(Request $request)
     {
         try {
@@ -43,6 +44,7 @@ class CashierController extends Controller
                 'items' => 'required|array|min:1',
                 'items.*.id' => 'required|exists:products,id',
                 'items.*.quantity' => 'required|integer|min:1',
+                'items.*.size' => 'nullable|string', // Tambahkan validasi untuk ukuran
                 'payment_method_id' => 'required|exists:payment_methods,id',
             ]);
 
@@ -57,8 +59,18 @@ class CashierController extends Controller
             // Cek stok semua produk sebelum memproses
             foreach ($request->items as $item) {
                 $product = Product::find($item['id']);
-                if ($product->stock < $item['quantity']) {
-                    throw new \Exception("Stok produk {$product->name} tidak mencukupi");
+
+                if (isset($item['size'])) {
+                    // Jika produk memiliki ukuran, cek stok ukuran
+                    $size = $product->sizes()->where('name', $item['size'])->first();
+                    if (!$size || $size->pivot->stock < $item['quantity']) {
+                        throw new \Exception("Stok untuk ukuran {$item['size']} pada produk {$product->name} tidak mencukupi");
+                    }
+                } else {
+                    // Jika produk tidak memiliki ukuran, cek stok produk
+                    if ($product->stock < $item['quantity']) {
+                        throw new \Exception("Stok produk {$product->name} tidak mencukupi");
+                    }
                 }
             }
 
@@ -80,23 +92,32 @@ class CashierController extends Controller
                 $product = Product::lockForUpdate()->find($item['id']);
                 $subtotal = $product->price * $item['quantity'];
 
+                // Simpan detail transaksi
                 $transaction->details()->create([
                     'product_id' => $product->id,
                     'quantity' => $item['quantity'],
                     'price' => $product->price,
                     'subtotal' => $subtotal,
+                    'size' => $item['size'] ?? null, // Simpan ukuran jika ada
                 ]);
 
-                $product->stock -= $item['quantity'];
-                $product->save();
+                if (isset($item['size'])) {
+                    // Jika produk memiliki ukuran, kurangi stok ukuran
+                    $size = $product->sizes()->where('name', $item['size'])->first();
+                    $product->sizes()->updateExistingPivot($size->id, [
+                        'stock' => $size->pivot->stock - $item['quantity']
+                    ]);
+                } else {
+                    // Jika produk tidak memiliki ukuran, kurangi stok produk
+                    $product->stock -= $item['quantity'];
+                    $product->save();
+                }
 
                 $total += $subtotal;
             }
 
             $transaction->total_amount = $total;
             $transaction->save();
-
-            
 
             DB::commit();
 
@@ -148,7 +169,7 @@ class CashierController extends Controller
         return $pdf->stream('invoice-' . $transaction->invoice_number . '.pdf');
     }
 
-    
+
 
     public function showReceipt($id)
     {

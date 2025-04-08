@@ -9,7 +9,9 @@
 
         <!-- Logo (hidden on mobile) -->
         <div class="hidden md:block">
-
+        <h1 class="text-xl font-bold font-mono text-center text-gray-800 dark:text-white">
+            {{ $storeProfile->name ?? 'Nama Toko' }}
+        </h1>
         </div>
 
         <!-- Right side items -->

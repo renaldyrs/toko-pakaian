@@ -31,10 +31,9 @@
         <div class="text-center mb-2">
             <h1 class="font-bold text-lg">{{ DB::table('store_profiles')->first()->name }}</h1>
             <img src="{{ DB::table('store_profiles')->first()->logo ? asset('storage/' . DB::table('store_profiles')->first()->logo) : asset('images/default-logo.png') }}"
-                alt="User Avatar" class="w-20 h-20 rounded-full mx-auto">
+                alt="Logo Toko" class="w-20 h-20 rounded-full mx-auto">
             <p>{{ DB::table('store_profiles')->first()->address }}</p>
             <p>Telp: {{ DB::table('store_profiles')->first()->phone }}</p>
-            
         </div>
 
         <div class="border-t border-b border-black py-2 my-2">
@@ -64,7 +63,12 @@
                 <tbody>
                     @foreach($transaction->details as $detail)
                     <tr>
-                        <td>{{ $detail->product->name }}</td>
+                        <td>
+                            {{ $detail->product->name }}
+                            @if ($detail->size)
+                                <span class="text-sm text-gray-500">({{ $detail->size }})</span>
+                            @endif
+                        </td>
                         <td class="text-right">{{ $detail->quantity }} x {{ number_format($detail->price) }}</td>
                         <td class="text-right">{{ number_format($detail->subtotal) }}</td>
                     </tr>

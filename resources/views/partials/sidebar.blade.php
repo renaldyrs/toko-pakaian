@@ -1,8 +1,11 @@
 <aside id="sidebar" class="w-64 bg-white dark:bg-gray-800 shadow-md fixed md:relative h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out z-50">
-    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-    <img src="{{ DB::table('store_profiles')->first()->logo ? asset('storage/' . DB::table('store_profiles')->first()->logo) : asset('images/default-logo.png') }}"
-    alt="User Avatar" class="w-23 h-23 rounded-full">
-        <h1 class="text-xl font-bold font-mono text-gray-800 dark:text-white">{{ DB::table('store_profiles')->first()->name }}</h1>
+    <div class="p-1 border-b border-gray-200 dark:border-gray-700">
+        @php
+            $storeProfile = \App\Models\StoreProfile::first();
+        @endphp
+        <img src="{{ $storeProfile && $storeProfile->logo ? asset('storage/' . $storeProfile->logo) : asset('images/default-logo.png') }}"
+            alt="Logo Toko" class="w-20 h-20 rounded-full mx-auto mb-2">
+        
     </div>
 
     <div class="overflow-y-auto h-full">

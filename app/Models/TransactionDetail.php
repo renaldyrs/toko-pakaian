@@ -15,6 +15,7 @@ class TransactionDetail extends Model
         'quantity',
         'price',
         'subtotal',
+        'size', // Menambahkan kolom size
     ];
 
     // Relasi ke Transaction

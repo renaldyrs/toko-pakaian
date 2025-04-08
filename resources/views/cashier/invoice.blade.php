@@ -5,7 +5,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
-            
             body * {
                 visibility: hidden;
             }
@@ -55,17 +54,22 @@
                 <tbody>
                     @foreach($transaction->details as $item)
                     <tr class="border-b">
-                        <td class="py-2">{{ $item->product->name }}</td>
-                        <td class="text-right">{{ number_format($item->price,0) }}</td>
+                        <td class="py-2">
+                            {{ $item->product->name }}
+                            @if($item->size)
+                                <span class="text-sm text-gray-500">(Ukuran: {{ $item->size }})</span>
+                            @endif
+                        </td>
+                        <td class="text-right">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
                         <td class="text-right">{{ $item->quantity }}</td>
-                        <td class="text-right">{{ number_format($item->subtotal,0) }}</td>
+                        <td class="text-right">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
                     </tr>
                     @endforeach
                 </tbody>
                 <tfoot>
                     <tr class="font-bold">
                         <td colspan="3" class="text-right pt-2">TOTAL</td>
-                        <td class="text-right pt-2">Rp {{ number_format($transaction->total_amount,0) }}</td>
+                        <td class="text-right pt-2">Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</td>
                     </tr>
                 </tfoot>
             </table>
