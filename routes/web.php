@@ -71,8 +71,9 @@ Route::prefix('financial-reports')->group(function () {
 
 // Store Profile
 Route::prefix('store-profile')->group(function () {
+    Route::get('/', [StoreProfileController::class, 'index'])->name('store-profile.index');
     Route::get('/edit', [StoreProfileController::class, 'edit'])->name('store-profile.edit');
-    Route::put('/update', [StoreProfileController::class, 'update'])->name('store-profile.update');
+    Route::patch('/update', [StoreProfileController::class, 'update'])->name('store-profile.update');
 });
 
 // Expenses

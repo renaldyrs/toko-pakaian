@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 
 class StoreProfileController extends Controller
 {
+    public function index(){
+        $profile = StoreProfile::first();
+        return view('store-profile.index', compact('profile'));
+    }
     // Menampilkan form edit profile toko
     public function edit()
     {
@@ -37,6 +41,6 @@ class StoreProfileController extends Controller
             'phone' => $request->phone,
         ]);
 
-        return redirect()->route('store-profile.edit')->with('success', 'Profile toko berhasil diperbarui.');
+        return redirect()->route('store-profile.index')->with('success', 'Profile toko berhasil diperbarui.');
     }
 }
