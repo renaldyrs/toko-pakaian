@@ -60,6 +60,11 @@
                             <i class="fas fa-boxes mr-3"></i> Produk
                         </a>
                     </li>
+                    <li class="mb-2">
+                        <a href="{{ route('payment.index') }}" class="block p-3 rounded-lg hover:bg-blue-800">
+                            <i class="fas fa-boxes mr-3"></i> Payment
+                        </a>
+                    </li>
                 </ul>
             </div>
 

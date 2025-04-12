@@ -15,7 +15,8 @@ use App\Http\Controllers\{
     StoreProfileController,
     ExpenseController,
     FinancialReportController,
-    ReturnController
+    ReturnController,
+    PaymentMethodController
 };
 
 Route::get('/', function () {
@@ -98,3 +99,5 @@ Route::middleware('auth')->prefix('profile')->group(function () {
 
 // Users
 Route::resource('users', UserController::class);
+
+Route::resource('payment', PaymentMethodController::class)->middleware('auth');
