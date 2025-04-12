@@ -1,7 +1,9 @@
+
+
 <!-- Sidebar -->
 <div id="sidebar"
-    class="w-64 bg-black text-white fixed md:relative h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out z-50 shadow-lg">
-    <div class="p-4 border-b border-blue-500">
+    class="w-64 bg-indigo-800 text-white fixed md:relative h-full transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out z-50 shadow-lg">
+    <div class="p-4 border-b border-indigo-700">
         @php
             $storeProfile = \App\Models\StoreProfile::first();
         @endphp
@@ -17,16 +19,16 @@
         <nav class="p-4">
             <!-- Dashboard -->
             <div class="mb-6">
-                <a href="{{ route('dashboard') }}"
-                    class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition duration-200">
-                    <i class="fas fa-tachometer-alt mr-3"></i>
+                <a href="{{ route('dashboard') }}" class="flex items-center p-3 rounded-lg hover:bg-indigo-700 transition duration-200">
+                    <i class="fas fa-home mr-3"></i>
                     <span>Dashboard</span>
                 </a>
             </div>
 
             <!-- Master Data Dropdown -->
             <div class="mb-6">
-                <button class="flex items-center justify-between w-full p-3 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none"
+                <button
+                    class="flex items-center justify-between w-full p-3 rounded-lg hover:bg-indigo-700 transition duration-200 focus:outline-none"
                     onclick="toggleDropdown('master-data-dropdown')">
                     <span class="flex items-center">
                         <i class="fas fa-database mr-3"></i>
@@ -35,7 +37,7 @@
                     <i class="fas fa-chevron-down"></i>
                 </button>
                 <ul id="master-data-dropdown" class="hidden mt-2">
-                    <li class="mb-2">
+                <li class="mb-2">
                         <a href="{{ route('store-profile.index') }}" class="block p-3 rounded-lg hover:bg-blue-800">
                             <i class="fas fa-store mr-3"></i> Toko
                         </a>
@@ -70,7 +72,8 @@
 
             <!-- Transaksi Dropdown -->
             <div class="mb-6">
-                <button class="flex items-center justify-between w-full p-3 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none"
+                <button
+                    class="flex items-center justify-between w-full p-3 rounded-lg hover:bg-indigo-700 transition duration-200 focus:outline-none"
                     onclick="toggleDropdown('transaksi-dropdown')">
                     <span class="flex items-center">
                         <i class="fas fa-exchange-alt mr-3"></i>
@@ -79,7 +82,7 @@
                     <i class="fas fa-chevron-down"></i>
                 </button>
                 <ul id="transaksi-dropdown" class="hidden mt-2">
-                    <li class="mb-2">
+                <li class="mb-2">
                         <a href="{{ route('cashier.index') }}" class="block p-3 rounded-lg hover:bg-blue-800">
                             <i class="fas fa-cash-register mr-3"></i> Kasir
                         </a>
@@ -99,7 +102,8 @@
 
             <!-- Laporan Dropdown -->
             <div class="mb-6">
-                <button class="flex items-center justify-between w-full p-3 rounded-lg hover:bg-blue-700 transition duration-200 focus:outline-none"
+                <button
+                    class="flex items-center justify-between w-full p-3 rounded-lg hover:bg-indigo-700 transition duration-200 focus:outline-none"
                     onclick="toggleDropdown('laporan-dropdown')">
                     <span class="flex items-center">
                         <i class="fas fa-chart-bar mr-3"></i>
@@ -108,7 +112,7 @@
                     <i class="fas fa-chevron-down"></i>
                 </button>
                 <ul id="laporan-dropdown" class="hidden mt-2">
-                    <li class="mb-2">
+                <li class="mb-2">
                         <a href="{{ route('reports.index') }}" class="block p-3 rounded-lg hover:bg-blue-800">
                             <i class="fas fa-clipboard-list mr-3"></i> Laporan Pesanan
                         </a>

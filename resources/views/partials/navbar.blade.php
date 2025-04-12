@@ -1,99 +1,139 @@
-<link rel="stylesheet" href="css/styles.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Navbar + Sidebar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
 
-<nav class=" dark:bg-gray-800 shadow-sm fixed w-full z-50 mb-2">
-    <div class="px-4 py-3 flex justify-between items-center">
-        <!-- Mobile menu button -->
-        <button id="mobile-menu-button" class="md:hidden text-gray-500 dark:text-gray-400 focus:outline-none">
-            <i class="fas fa-bars text-xl"></i>
-        </button>
-
-        <!-- Logo (hidden on mobile) -->
-        <div class="hidden md:block">
-            <h1 class="text-xl font-bold font-mono text-center text-gray-800 dark:text-white">
-                {{ $storeProfile->name ?? 'Toko Ku' }}
-            </h1>
-        </div>
-
-        <!-- Right side items -->
-        <div class="flex items-center space-x-4">
-            <!-- Dark mode toggle -->
-            <button id="dark-mode-toggle" class="text-gray-500 dark:text-gray-400 focus:outline-none">
-                <i class="fas fa-moon dark:hidden"></i>
-                <i class="fas fa-sun hidden dark:block"></i>
-            </button>
-
-            <!-- User dropdown -->
-            <div class="relative">
-                <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
-                    <span class="text-gray-700 dark:text-gray-300">{{ Auth::user()->name }}</span>
-                    <i class="fas fa-chevron-down text-xs text-gray-500 dark:text-gray-400"></i>
-                </button>
-
-                <!-- Dropdown menu -->
-                <div id="user-dropdown"
-                    class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-50">
-                    <a href="{{ route('profile.edit') }}"
-                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">Profil</a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit"
-                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">Logout</button>
-                    </form>
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between px-4 py-3">
+                    <!-- Hamburger menu untuk mobile -->
+                    <div class="flex items-center">
+                        <button id="sidebar-toggle" class="md:hidden text-gray-500 focus:outline-none">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <span class="ml-4 text-lg font-semibold text-gray-800 md:hidden">My App</span>
+                    </div>
+                    
+                    <!-- Search bar -->
+                    <div class="hidden md:block flex-1 mx-8">
+                        <div class="relative">
+                            <input type="text" placeholder="Search..." 
+                                   class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- User profile dan notifications -->
+                    <div class="flex items-center space-x-4">
+                        <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500"></span>
+                        </button>
+                        <div class="relative">
+                            <button id="user-menu-button" class="flex items-center focus:outline-none">
+                                <img src="https://via.placeholder.com/40" alt="User" class="h-8 w-8 rounded-full">
+                                <span class="ml-2 text-gray-700 hidden md:inline">John Doe</span>
+                                <i class="fas fa-chevron-down ml-1 text-gray-500 text-xs"></i>
+                            </button>
+                            <!-- Dropdown menu -->
+                            <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</nav>
+            </header>
 
 
 
-<!-- Overlay for sidebar -->
-<div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-30"></div>
+    <!-- Mobile sidebar overlay (hidden by default) -->
+    <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>
 
-<!-- JavaScript -->
-<script>
-    // Sidebar toggle for mobile
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebar-overlay');
+                <script>
+            // Toggle sidebar on mobile
+            document.getElementById('sidebar-toggle').addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                
+                sidebar.classList.toggle('hidden');
+                overlay.classList.toggle('hidden');
+                
+                // Add animation classes
+                sidebar.classList.add('animate-slide-in');
+                setTimeout(() => {
+                    sidebar.classList.remove('animate-slide-in');
+                }, 300);
+            });
+        
+            // Close sidebar when clicking on overlay
+            document.getElementById('sidebar-overlay').addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.add('hidden');
+                this.classList.add('hidden');
+            });
+        
+            // Close sidebar when clicking a menu item (mobile only)
+            const sidebarLinks = document.querySelectorAll('#sidebar a');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const sidebar = document.getElementById('sidebar');
+                    const overlay = document.getElementById('sidebar-overlay');
+                    sidebar.classList.add('hidden');
+                    overlay.classList.add('hidden');
+                });
+            });
+        
+            // Automatically hide sidebar on window resize (for mobile to desktop transition)
+            window.addEventListener('resize', function() {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                if (window.innerWidth >= 768) { // md breakpoint
+                    sidebar.classList.add('hidden');
+                    overlay.classList.add('hidden');
+                }
+            });
+        
+            // Toggle user dropdown menu
+            document.getElementById('user-menu-button').addEventListener('click', function() {
+                document.getElementById('user-menu').classList.toggle('hidden');
+            });
+        
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                const userMenu = document.getElementById('user-menu');
+                const userButton = document.getElementById('user-menu-button');
+                
+                if (!userMenu.contains(event.target) && !userButton.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+        </script>
 
-    mobileMenuButton.addEventListener('click', () => {
-        sidebar.classList.toggle('-translate-x-full');
-        sidebarOverlay.classList.toggle('hidden');
-    });
-
-    sidebarOverlay.addEventListener('click', () => {
-        sidebar.classList.add('-translate-x-full');
-        sidebarOverlay.classList.add('hidden');
-    });
-
-    // User dropdown toggle
-    const userMenuButton = document.getElementById('user-menu-button');
-    const userDropdown = document.getElementById('user-dropdown');
-
-    userMenuButton.addEventListener('click', () => {
-        userDropdown.classList.toggle('hidden');
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!userMenuButton.contains(e.target) && !userDropdown.contains(e.target)) {
-            userDropdown.classList.add('hidden');
+    <style>
+        /* Animation for sidebar */
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 50;
         }
-    });
-
-    // Dark mode toggle
-    const darkModeToggle = document.getElementById('dark-mode-toggle');
-    darkModeToggle.addEventListener('click', () => {
-        const html = document.documentElement;
-        const isDarkMode = html.classList.toggle('dark');
-        localStorage.setItem('darkMode', isDarkMode);
-    });
-
-    // Initialize dark mode
-    document.addEventListener('DOMContentLoaded', () => {
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.documentElement.classList.add('dark');
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
         }
-    });
-</script>
+    </style>
+</body>
+</html>
