@@ -11,7 +11,7 @@
                     
 
                 </div>
-                <h1 class="text-2xl font-bold text-gray-800 ">{{ DB::table('store_profiles')->first()->name }}</h1>
+                
             </div>
 
             <form method="POST" action="{{ route('login') }}">
