@@ -51,7 +51,7 @@
                             <td class="px-6 py-4 text-center text-gray-700 dark:text-gray-300">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 grid justify-items-center">
                                 @if ($product->image)
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                                    <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}"
                                         class="w-16 h-16 object-cover rounded-md shadow-md">
                                 @else
                                     <span class="text-gray-400">Tidak ada gambar</span>
