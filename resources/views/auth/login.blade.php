@@ -7,13 +7,7 @@
             <div class="text-center mb-6 flex flex-col items-center">
 
                 <div class="mb-2">
-                    @if (DB::table('store_profiles')->first()->logo)
-                        <img src="{{ asset('storage/' . DB::table('store_profiles')->first()->logo) }}"
-                            alt="Logo Toko" class="w-23 h-23 rounded-full">
-                    @else
-                        <p class="mt-2 text-gray-500 dark:text-gray-400">Belum ada logo</p>
                     
-                    @endif
                     
 
                 </div>
