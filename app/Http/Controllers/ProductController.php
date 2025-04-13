@@ -42,7 +42,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'sizes' => 'required|array',
+            'sizes' => 'nullable|array',
             'sizes.*.name' => 'required|string|max:255',
             'sizes.*.stock' => 'required|integer|min:0',
         ]);
