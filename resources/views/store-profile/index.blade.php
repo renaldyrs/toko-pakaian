@@ -7,6 +7,7 @@
 
     <div class="container mx-auto p-4 flex justify-center items-center">
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg dark:bg-gray-800">
+        
             <!-- Logo Toko -->
             <div class="flex flex-col items-center mb-6">
                 @if ($profile->logo)
@@ -44,4 +45,6 @@
             </div>
         </div>
     </div>
+
+       
 @endsection

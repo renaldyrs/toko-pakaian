@@ -74,6 +74,8 @@ Route::prefix('financial-reports')->group(function () {
 Route::prefix('store-profile')->group(function () {
     Route::get('/', [StoreProfileController::class, 'index'])->name('store-profile.index');
     Route::get('/edit', [StoreProfileController::class, 'edit'])->name('store-profile.edit');
+    Route::post('/store', [StoreProfileController::class, 'store'])->name('store-profile.store');
+    Route::get('/create', [StoreProfileController::class, 'create'])->name('store-profile.create');
     Route::patch('/update', [StoreProfileController::class, 'update'])->name('store-profile.update');
 });
 
